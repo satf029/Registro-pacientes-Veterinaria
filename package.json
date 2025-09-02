@@ -1,0 +1,33 @@
+{
+  "name": "registro-pacientes-veterinaria",
+  "version": "1.0.0",
+  "description": "Aplicación web para registrar y gestionar información de pacientes en una veterinaria, incluyendo datos del animal, su propietario y historial de consultas.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/satf029/Registro-pacientes-Veterinaria.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/satf029/Registro-pacientes-Veterinaria/issues"
+  },
+  "homepage": "https://github.com/satf029/Registro-pacientes-Veterinaria#readme",
+  "dependencies": {
+    "@prisma/client": "^6.15.0",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.3.0",
+    "prisma": "^6.15.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.2"
+  }
+}

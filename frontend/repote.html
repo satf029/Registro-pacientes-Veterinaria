@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+    <title>Reporte del Clima</title>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">Reporte</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="weatherForm">
+                            <div class="mb-3">
+                                <label for="date" class="form-label">Fecha</label>
+                                <input type="date" class="form-control" id="date" name="date" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Enviar</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Resultados -->
+                <div id="results" class="mt-4" style="display: none;">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5>Clima</h5>
+                            <div id="weatherData"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading -->
+                <div id="loading" class="mt-4 text-center" style="display: none;">
+                    <div class="spinner-border" role="status"></div>
+                    <p>Cargando...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Establecer fecha de hoy por defecto
+        document.getElementById('date').valueAsDate = new Date();
+
+        document.getElementById('weatherForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const token = localStorage.getItem("token");
+            
+            if (!token) {
+                alert("No hay sesión activa. Redirigiendo al login...");
+                window.location.href = "login.html";
+                return;
+            }
+            
+            const date = document.getElementById('date').value;
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            
+            // Mostrar loading
+            loading.style.display = 'block';
+            results.style.display = 'none';
+
+            try {
+                const params = new URLSearchParams({
+                    city: 'Aregua',
+                    date: date
+                });
+
+                const response = await fetch(`http://localhost:3000/api/clima?${params}`);
+
+                if (response.status === 403) {
+                    document.getElementById('weatherData').innerHTML = `
+                        <p class="text-danger">Error 403: El endpoint /api/weather no existe o no tienes permisos</p>
+                    `;
+                    results.style.display = 'block';
+                    loading.style.display = 'none';
+                    return;
+                }
+
+                if (response.status === 401) {
+                    alert("Sesión expirada. Redirigiendo al login...");
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("userId");
+                    window.location.href = "login.html";
+                    return;
+                }
+
+                const data = await response.json();
+                console.log(data.data);
+                if (data.data.found) {
+                    document.getElementById('weatherData').innerHTML = `
+                        <p><strong>Ubicación:</strong> ${data.data.location}</p>
+                        <p><strong>Fecha:</strong> ${data.data.date}</p>
+                        <p><strong>Temperatura máxima:</strong> ${data.data.tmax}°C</p>
+                        <p><strong>Temperatura mínima:</strong> ${data.data.tmin}°C</p>
+                        <p><strong>Precipitación:</strong> ${data.data.precipitation} mm</p>
+                    `;
+                } else {
+                    document.getElementById('weatherData').innerHTML = `
+                        <p class="text-danger">${data.message}</p>
+                    `;
+                }
+
+                results.style.display = 'block';
+            } catch (error) {
+                document.getElementById('weatherData').innerHTML = `
+                    <p class="text-danger">Error: ${error.message}</p>
+                `;
+                results.style.display = 'block';
+            }
+
+            loading.style.display = 'none';
+        });
+    </script>
+</body>
+</html>

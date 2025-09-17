@@ -12,39 +12,208 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+model Persona {
+  id        Int      @id @default(autoincrement())
+  nombre    String
+  apellido  String?
+  telefono  String
+  email     String?  @unique
+  direccion String?
+  documento String?  @unique
+  
+  // Relaciones
+  user      User?
+  propietario     Propietario?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
+
+model User {
+  id        Int    @id @default(autoincrement())
+  username  String @unique
+  password  String
+  activo    Boolean @default(true)
+  
+  // Relaciones
+  personaId Int    @unique
+  persona   Persona @relation(fields: [personaId], references: [id])
+  roles     UserRol[]
+  servicios Servicio[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Rol {
+  id          Int    @id @default(autoincrement())
+  nombre      String @unique
+  descripcion String?
+  
+  // Relaciones
+  usuarios  UserRol[]
+  permisos  RolPermiso[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UserRol {
+  id     Int @id @default(autoincrement())
+  userId Int
+  rolId  Int
+  
+  user User @relation(fields: [userId], references: [id])
+  rol  Rol  @relation(fields: [rolId], references: [id])
+  
+  @@unique([userId, rolId])
+}
+
+model Permiso {
+  id          Int    @id @default(autoincrement())
+  nombre      String @unique
+  descripcion String?
+  
+  // Relaciones
+  roles RolPermiso[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RolPermiso {
+  id        Int @id @default(autoincrement())
+  rolId     Int
+  permisoId Int
+  
+  rol     Rol     @relation(fields: [rolId], references: [id])
+  permiso Permiso @relation(fields: [permisoId], references: [id])
+  
+  @@unique([rolId, permisoId])
+}
 model Propietario {
-  id         Int        @id @default(autoincrement())
-  nombre     String
-  telefono   String
-  email      String     @unique
-  direccion  String?
-  pacientes  Paciente[] 
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  id        Int @id @default(autoincrement())
+  personaId Int @unique
+  
+  // Relaciones
+  persona  Persona   @relation(fields: [personaId], references: [id])
+  mascotas Mascota[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model Mascota {
+  id       Int     @id @default(autoincrement())
+  nombre   String
+  especie  String
+  raza     String?
+  edad     Int?
+  peso     Float?
+  sexo     String?
+  color    String?
+  
+  // Relaciones
+  duenoId          Int
+  dueno            Propietario           @relation(fields: [duenoId], references: [id])
+  servicios        Servicio[]
+  //historialesMedicos HistorialMedico[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model Paciente {
-  id            Int        @id @default(autoincrement())
-  nombre        String
-  especie       String     
-  raza          String?
-  edad          Int?
-  propietarioId Int
-  propietario   Propietario @relation(fields: [propietarioId], references: [id])
-  consultas     Consulta[]
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+model Animal {
+  id      Int    @id @default(autoincrement())
+  especie String @unique
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model Consulta {
-  id          Int        @id @default(autoincrement())
-  fecha       DateTime   @default(now())
-  motivo      String
+model TipoServicio {
+  id          Int    @id @default(autoincrement())
+  nombre      String @unique
+  descripcion String?
+  precio      Float?
+  duracion    Int? // en minutos
+  
+  // Relaciones
+  servicios Servicio[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Servicio {
+  id          Int      @id @default(autoincrement())
+  fecha       DateTime @default(now())
+  estado      String   @default("pendiente") // pendiente, en_proceso, completado, cancelado
+  precio      Float?
+  observaciones String?
+  
+  // Relaciones
+  mascotaId     Int
+  tipoServicioId Int
+  empleadoId    Int? // Usuario que realizó el servicio
+  
+  mascota       Mascota     @relation(fields: [mascotaId], references: [id])
+  tipoServicio  TipoServicio @relation(fields: [tipoServicioId], references: [id])
+  empleado      User?       @relation(fields: [empleadoId], references: [id])
+  
+  detalleServicios DetalleServicio[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DetalleServicio {
+  id          Int @id @default(autoincrement())
+  servicioId  Int
+  medicamentoId Int
+  cantidad    Float
+  dosis       String?
+  
+  // Relaciones
+  servicio     Servicio    @relation(fields: [servicioId], references: [id])
+  medicamento  Medicamento @relation(fields: [medicamentoId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Medicamento {
+  id                Int    @id @default(autoincrement())
+  nombre            String
+  principioActivo   String?
+  laboratorio       String?
+  dosis             String?
+  presentacion      String?
+  stock             Int    @default(0)
+  precio            Float?
+  requierePrescripcion Boolean @default(false)
+  
+  // Relaciones
+  detalleServicios DetalleServicio[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+/*
+model HistorialMedico {
+  id          Int      @id @default(autoincrement())
+  fecha       DateTime @default(now())
+  peso        Float?
+  temperatura Float?
   diagnostico String?
   tratamiento String?
-  pacienteId  Int
-  paciente    Paciente   @relation(fields: [pacienteId], references: [id])
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-}
+  observaciones String?
+  proximaVisita DateTime?
+  
+  // Relaciones
+  mascotaId Int
+  mascota   Mascota @relation(fields: [mascotaId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}*/

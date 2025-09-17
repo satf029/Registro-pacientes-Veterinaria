@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+    <title>Crear Usuario</title>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>📝 Crear Nuevo Usuario</h1>
+        
+        <!-- Agregar div para mostrar mensajes -->
+        <div id="output" class="alert alert-danger" style="display: none;"></div>
+        <div id="success-output" class="alert alert-success" style="display: none;"></div>
+        
+        <!-- Campos requeridos -->
+        <div class="input-group flex-nowrap mb-3">
+            <span class="input-group-text">📄</span>
+            <input type="text" class="form-control" id="documento" placeholder="Documento" aria-label="Documento">
+        </div>
+        
+        <div class="input-group flex-nowrap mb-3">
+            <span class="input-group-text">🔒</span>
+            <input type="password" class="form-control" id="password" placeholder="Contraseña" aria-label="Password">
+        </div>
+        
+        <div class="input-group flex-nowrap mb-3">
+            <span class="input-group-text">👤</span>
+            <input type="text" class="form-control" id="nombre" placeholder="Nombre" aria-label="Nombre">
+        </div>
+        
+        <div class="input-group flex-nowrap mb-3">
+            <span class="input-group-text">📞</span>
+            <input type="tel" class="form-control" id="telefono" placeholder="Teléfono" aria-label="Telefono">
+        </div>
+        
+        <!-- Campos opcionales -->
+        <div class="input-group flex-nowrap mb-3">
+            <span class="input-group-text">👨‍👩‍👧‍👦</span>
+            <input type="text" class="form-control" id="apellido" placeholder="Apellido (opcional)" aria-label="Apellido">
+        </div>
+        
+        <div class="input-group flex-nowrap mb-3">
+            <span class="input-group-text">📧</span>
+            <input type="email" class="form-control" id="email" placeholder="Email (opcional)" aria-label="Email">
+        </div>
+        
+        <div class="input-group flex-nowrap mb-3">
+            <span class="input-group-text">🏠</span>
+            <input type="text" class="form-control" id="direccion" placeholder="Dirección (opcional)" aria-label="Direccion">
+        </div>
+        
+        <div class="input-group flex-nowrap mb-3">
+            <span class="input-group-text">🎭</span>
+            <input type="number" class="form-control" id="roleId" placeholder="Role ID (opcional)" aria-label="RoleId">
+        </div>
+        
+        <!-- Checkbox para activo -->
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="activo" checked>
+            <label class="form-check-label" for="activo">
+                ✅ Usuario activo
+            </label>
+        </div>
+        
+        <button type="button" class="btn btn-success" onclick="crearUsuario()">➕ Crear Usuario</button>
+        <button type="button" class="btn btn-secondary" onclick="limpiarFormulario()">🔄 Limpiar</button>
+    </div>
+
+    <script>
+        async function crearUsuario() {
+            // Obtener valores de los campos
+            const documento = document.getElementById("documento").value;
+            const password = document.getElementById("password").value;
+            const nombre = document.getElementById("nombre").value;
+            const telefono = document.getElementById("telefono").value;
+            const apellido = document.getElementById("apellido").value;
+            const email = document.getElementById("email").value;
+            const direccion = document.getElementById("direccion").value;
+            const roleId = document.getElementById("roleId").value;
+            const activo = document.getElementById("activo").checked;
+            
+            // Validar campos requeridos
+            if (!documento || !password || !nombre || !telefono) {
+                document.getElementById("output").style.display = "block";
+                document.getElementById("output").textContent = "Error: Documento, contraseña, nombre y teléfono son requeridos";
+                document.getElementById("success-output").style.display = "none";
+                return;
+            }
+            
+            // Preparar datos para enviar
+            const userData = {
+                documento,
+                password,
+                nombre,
+                telefono,
+                activo
+            };
+            
+            // Agregar campos opcionales solo si tienen valor
+            if (apellido) userData.apellido = apellido;
+            if (email) userData.email = email;
+            if (direccion) userData.direccion = direccion;
+            if (roleId) userData.roleId = parseInt(roleId);
+            
+            try {
+                const res = await fetch("http://localhost:3000/api/users", {
+                    method: "POST",
+                    headers: { 
+                        "Content-Type": "application/json",
+                        // Si necesitas autenticación, descomenta la siguiente línea
+                        // "Authorization": `Bearer ${localStorage.getItem("token")}`
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    document.getElementById("success-output").style.display = "block";
+                    document.getElementById("success-output").textContent = "✅ Usuario creado exitosamente!";
+                    document.getElementById("output").style.display = "none";
+                    
+                    // Limpiar formulario después de crear usuario
+                    limpiarFormulario();
+                    
+                    // Opcional: redirigir después de unos segundos
+                    // setTimeout(() => {
+                    //     window.location.href = "usuarios.html";
+                    // }, 2000);
+                    
+                } else {
+                    const errorText = await res.text();
+                    document.getElementById("output").style.display = "block";
+                    document.getElementById("output").textContent = "Error: " + errorText;
+                    document.getElementById("success-output").style.display = "none";
+                }
+                window.location.href ="usuarios.html"
+            } catch (error) {
+                document.getElementById("output").style.display = "block";
+                document.getElementById("output").textContent = "Error de conexión: " + error.message;
+                document.getElementById("success-output").style.display = "none";
+            }
+        }
+        
+        function limpiarFormulario() {
+            document.getElementById("documento").value = "";
+            document.getElementById("password").value = "";
+            document.getElementById("nombre").value = "";
+            document.getElementById("telefono").value = "";
+            document.getElementById("apellido").value = "";
+            document.getElementById("email").value = "";
+            document.getElementById("direccion").value = "";
+            document.getElementById("roleId").value = "";
+            document.getElementById("activo").checked = true;
+            
+            // Ocultar mensajes
+            document.getElementById("output").style.display = "none";
+            document.getElementById("success-output").style.display = "none";
+        }
+    </script>
+</body>
+</html>

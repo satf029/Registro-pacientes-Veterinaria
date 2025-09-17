@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+    <title>Agregar Medicamento</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Servicios</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:window.location.href='usuarios.html'">Usuarios</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:window.location.href='mascotas.html'">Pacientes</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="javascript:window.location.href='medicamentos.html'">Medicamentos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Roles</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h3 class="card-title mb-0">💊 Agregar Nuevo Medicamento</h3>
+                        <button type="button" class="btn btn-light btn-sm" onclick="volverAtras()">
+                            ← Volver
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <form id="medicamentoForm">
+                            <div class="row">
+                                <!-- Información Básica -->
+                                <div class="col-md-12">
+                                    <h5 class="text-primary mb-3">📋 Información Básica</h5>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="nombre" class="form-label">Nombre del Medicamento <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="nombre" name="nombre" required>
+                                    <div class="invalid-feedback">
+                                        Por favor ingrese el nombre del medicamento.
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="principioActivo" class="form-label">Principio Activo</label>
+                                    <input type="text" class="form-control" id="principioActivo" name="principioActivo">
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="laboratorio" class="form-label">Laboratorio</label>
+                                    <input type="text" class="form-control" id="laboratorio" name="laboratorio">
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="dosis" class="form-label">Dosis</label>
+                                    <input type="text" class="form-control" id="dosis" name="dosis" placeholder="Ej: 500mg cada 8 horas">
+                                </div>
+                                
+                                <div class="col-md-12 mb-3">
+                                    <label for="presentacion" class="form-label">Presentación</label>
+                                    <input type="text" class="form-control" id="presentacion" name="presentacion" placeholder="Ej: Tabletas x 20, Frasco 50ml">
+                                </div>
+                                
+                                <!-- Información Comercial -->
+                                <div class="col-md-12 mt-4">
+                                    <h5 class="text-primary mb-3">💰 Información Comercial</h5>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="precio" class="form-label">Precio ($)</label>
+                                    <input type="number" class="form-control" id="precio" name="precio" step="0.01" min="0">
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="stock" class="form-label">Stock Inicial</label>
+                                    <input type="number" class="form-control" id="stock" name="stock" value="0" min="0">
+                                </div>
+                                
+                                <!-- Configuración -->
+                                <div class="col-md-12 mt-4">
+                                    <h5 class="text-primary mb-3">⚙️ Configuración</h5>
+                                </div>
+                                
+                                <div class="col-md-12 mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="requierePrescripcion" name="requierePrescripcion">
+                                        <label class="form-check-label" for="requierePrescripcion">
+                                            Requiere prescripción médica
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <!-- Botones -->
+                                <div class="col-md-12 mt-4">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <button type="button" class="btn btn-secondary" onclick="volverAtras()">
+                                            Cancelar
+                                        </button>
+                                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                                            <span class="spinner-border spinner-border-sm d-none" id="loadingSpinner"></span>
+                                            💾 Guardar Medicamento
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de alerta -->
+    <div class="alert alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3" 
+         role="alert" id="alertModal" style="display: none; z-index: 1050;">
+        <span id="alertMessage"></span>
+        <button type="button" class="btn-close" onclick="hideAlert()"></button>
+    </div>
+
+    <script>
+        function volverAtras() {
+            window.location.href = 'medicamentos.html';
+        }
+
+        function showAlert(message, type) {
+            const alertModal = document.getElementById('alertModal');
+            const alertMessage = document.getElementById('alertMessage');
+            
+            alertModal.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+            alertMessage.textContent = message;
+            alertModal.style.display = 'block';
+            
+            setTimeout(hideAlert, 4000);
+        }
+
+        function hideAlert() {
+            const alertModal = document.getElementById('alertModal');
+            alertModal.style.display = 'none';
+        }
+
+        function toggleLoading(show) {
+            const spinner = document.getElementById('loadingSpinner');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (show) {
+                spinner.classList.remove('d-none');
+                submitBtn.disabled = true;
+            } else {
+                spinner.classList.add('d-none');
+                submitBtn.disabled = false;
+            }
+        }
+
+        document.getElementById('medicamentoForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const token = localStorage.getItem("token");
+            if (!token) {
+                showAlert("No hay sesión activa. Redirigiendo al login...", "warning");
+                setTimeout(() => {
+                    window.location.href = "login.html";
+                }, 2000);
+                return;
+            }
+
+            // Validar formulario
+            const form = e.target;
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                return;
+            }
+
+            toggleLoading(true);
+
+            // Recopilar datos del formulario
+            const formData = new FormData(form);
+            const medicamentoData = {
+                nombre: formData.get('nombre'),
+                principioActivo: formData.get('principioActivo') || null,
+                laboratorio: formData.get('laboratorio') || null,
+                dosis: formData.get('dosis') || null,
+                presentacion: formData.get('presentacion') || null,
+                precio: formData.get('precio') ? parseFloat(formData.get('precio')) : null,
+                stock: parseInt(formData.get('stock')) || 0,
+                requierePrescripcion: formData.has('requierePrescripcion')
+            };
+
+            try {
+                const response = await fetch('http://localhost:3000/api/medicamentos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(medicamentoData)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    showAlert(`Medicamento "${result.nombre}" creado exitosamente`, "success");
+                    
+                    // Limpiar formulario
+                    form.reset();
+                    form.classList.remove('was-validated');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'medicamentos.html';
+                    }, 2000);
+                    
+                } else if (response.status === 401) {
+                    showAlert("Sesión expirada. Redirigiendo al login...", "warning");
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("userId");
+                    setTimeout(() => {
+                        window.location.href = "login.html";
+                    }, 2000);
+                } else {
+                    const errorData = await response.json();
+                    showAlert(`Error: ${errorData.message}`, "danger");
+                }
+            } catch (error) {
+                showAlert(`Error de conexión: ${error.message}`, "danger");
+            } finally {
+                toggleLoading(false);
+            }
+        });
+
+        // Validación en tiempo real
+        document.getElementById('nombre').addEventListener('input', function() {
+            this.classList.remove('is-invalid');
+            if (this.value.trim() !== '') {
+                this.classList.add('is-valid');
+            }
+        });
+
+        document.getElementById('precio').addEventListener('input', function() {
+            const value = parseFloat(this.value);
+            if (value < 0) {
+                this.setCustomValidity('El precio no puede ser negativo');
+                this.classList.add('is-invalid');
+            } else {
+                this.setCustomValidity('');
+                this.classList.remove('is-invalid');
+                if (this.value !== '') {
+                    this.classList.add('is-valid');
+                }
+            }
+        });
+
+        document.getElementById('stock').addEventListener('input', function() {
+            const value = parseInt(this.value);
+            if (value < 0) {
+                this.setCustomValidity('El stock no puede ser negativo');
+                this.classList.add('is-invalid');
+            } else {
+                this.setCustomValidity('');
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
+    </script>
+</body>
+</html>

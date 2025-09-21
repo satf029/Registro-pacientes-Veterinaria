@@ -1,33 +1,424 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
-    <title>Listas de mascotas</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"/>
+  <title>Agregar Paciente</title>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="collapse navbar-collapse" id="navbarNavDropdown">
-            <ul class="navbar-nav mx-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#">Servicios</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href = "javascript:window.location.href='usuarios.html'">Usuarios</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="javascript:window.location.href='mascotas.html'">Pacientes</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Medicamentos</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Roles</a>
-                </li>
-            </ul>
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item"><a class="nav-link" href="services.html">Servicios</a></li>
+        <li class="nav-item"><a class="nav-link" href="usuarios.html">Usuarios</a></li>
+        <li class="nav-item active"><a class="nav-link" href="mascotas.html">Pacientes</a></li>
+        <li class="nav-item"><a class="nav-link" href="medicamentos.html">Medicamentos</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Roles</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container mt-4">
+    <div class="row justify-content-center">
+      <div class="col-md-10">
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h3 class="card-title mb-0">🐾 Agregar Nuevo Paciente</h3>
+            <button type="button" class="btn btn-light btn-sm" onclick="volverAtras()">← Volver</button>
+          </div>
+
+          <div class="card-body">
+            <form id="pacienteForm" novalidate>
+              <div class="row g-3">
+                <!-- Info Paciente -->
+                <div class="col-12">
+                  <h5 class="text-primary mb-2">📋 Información del Paciente</h5>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Nombre <span class="text-danger">*</span></label>
+                  <input type="text" id="nombre" class="form-control" required>
+                  <div class="invalid-feedback">Ingrese el nombre del paciente.</div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Especie <span class="text-danger">*</span></label>
+                  <select id="especie" class="form-select" required>
+                    <option value="">Seleccionar especie</option>
+                    <option>Canino</option>
+                    <option>Felino</option>
+                    <option>Ave</option>
+                    <option>Reptil</option>
+                    <option>Roedor</option>
+                    <option>Otro</option>
+                  </select>
+                  <div class="invalid-feedback">Seleccione la especie.</div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Raza</label>
+                  <input type="text" id="raza" class="form-control" placeholder="Ej: Labrador, Siames">
+                </div>
+
+                <div class="col-md-3">
+                  <label class="form-label">Edad (años)</label>
+                  <input type="number" id="edad" class="form-control" min="0" step="1" placeholder="Ej: 3">
+                  <div class="invalid-feedback">La edad no puede ser negativa.</div>
+                </div>
+
+                <div class="col-md-3">
+                  <label class="form-label">Peso (kg)</label>
+                  <input type="number" id="peso" class="form-control" min="0" step="0.01" placeholder="Ej: 12.5">
+                  <div class="invalid-feedback">El peso no puede ser negativo.</div>
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label">Sexo</label>
+                  <select id="sexo" class="form-select">
+                    <option value="">No especificado</option>
+                    <option value="Macho">Macho</option>
+                    <option value="Hembra">Hembra</option>
+                  </select>
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label">Color</label>
+                  <input type="text" id="color" class="form-control" placeholder="Ej: Marrón, Blanco y negro">
+                </div>
+
+                <!-- Propietario -->
+                <div class="col-12 mt-2">
+                  <h5 class="text-primary mb-2">👤 Propietario</h5>
+                </div>
+
+                <!-- Buscador por documento -->
+                <div class="col-md-6">
+                  <label class="form-label">Documento del Propietario <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <input type="text" id="docProp" class="form-control" placeholder="Ej: 1234567" required>
+                    <button type="button" class="btn btn-outline-primary" id="btnBuscarProp">Buscar</button>
+                  </div>
+                  <div class="form-text">Ingrese el N° de documento y presione “Buscar”.</div>
+                  <div class="invalid-feedback">Ingrese el documento del propietario.</div>
+                </div>
+
+                <!-- Estado búsqueda -->
+                <div class="col-md-6 d-flex align-items-end">
+                  <span id="estadoBusqueda" class="text-muted"></span>
+                </div>
+
+                <!-- Resumen propietario encontrado -->
+                <div class="col-12" id="propietarioResumen" style="display:none;">
+                  <div class="alert alert-success d-flex justify-content-between align-items-start">
+                    <div>
+                      <strong>Propietario encontrado:</strong>
+                      <div id="propResumenDatos" class="small"></div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="btnLimpiarBusqueda">Cambiar documento</button>
+                  </div>
+                </div>
+
+                <!-- Subform creación propietario (si no existe) -->
+                <div class="col-12" id="propietarioCrearWrap" style="display:none;">
+                  <div class="border rounded p-3">
+                    <h6 class="mb-3">Crear Propietario</h6>
+                    <div class="row g-2">
+                      <div class="col-md-6">
+                        <label class="form-label">Documento (CI) <span class="text-danger">*</span></label>
+                        <input type="text" id="pDocumento" class="form-control" required>
+                        <div class="invalid-feedback">Debe ingresar el documento (CI).</div>
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label">Nombre <span class="text-danger">*</span></label>
+                        <input type="text" id="pNombre" class="form-control" required>
+                        <div class="invalid-feedback">Ingrese el nombre.</div>
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label">Apellido</label>
+                        <input type="text" id="pApellido" class="form-control">
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label">Teléfono <span class="text-danger">*</span></label>
+                        <input type="text" id="pTelefono" class="form-control" required>
+                        <div class="invalid-feedback">Ingrese un teléfono válido.</div>
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="pEmail" class="form-control">
+                      </div>
+                      <div class="col-md-12">
+                        <label class="form-label">Dirección</label>
+                        <input type="text" id="pDireccion" class="form-control">
+                      </div>
+                    </div>
+                    <small class="text-muted d-block mt-2">
+                      Se creará Persona + Propietario si no existe uno con ese documento.
+                    </small>
+                  </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="col-12 mt-3 d-flex justify-content-end gap-2">
+                  <button type="button" class="btn btn-secondary" onclick="volverAtras()">Cancelar</button>
+                  <button type="submit" class="btn btn-primary" id="submitBtn">
+                    <span class="spinner-border spinner-border-sm d-none" id="loadingSpinner"></span>
+                    💾 Guardar Paciente
+                  </button>
+                </div>
+
+                <!-- hidden: duenoId -->
+                <input type="hidden" id="duenoId">
+              </div>
+            </form>
+          </div>
+
         </div>
-    </nav>
-    <h1>mascotas</h1>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alertita -->
+  <div class="alert alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+       role="alert" id="alertModal" style="display:none; z-index:1050;">
+    <span id="alertMessage"></span>
+    <button type="button" class="btn btn-close" onclick="hideAlert()"></button>
+  </div>
+
+  <script>
+    const API = 'http://localhost:3000';
+
+    function volverAtras(){ window.location.href = 'mascotas.html'; }
+    function showAlert(message, type){
+      const m=document.getElementById('alertModal'), t=document.getElementById('alertMessage');
+      m.className=`alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+      t.textContent=message; m.style.display='block'; setTimeout(hideAlert, 4000);
+    }
+    function hideAlert(){ document.getElementById('alertModal').style.display='none'; }
+    function toggleLoading(show){
+      const sp=document.getElementById('loadingSpinner'), btn=document.getElementById('submitBtn');
+      if(show){ sp.classList.remove('d-none'); btn.disabled=true; } else { sp.classList.add('d-none'); btn.disabled=false; }
+    }
+
+    // ---- API helpers (ajusta si tu contrato difiere) ----
+    async function apiBuscarPropietarioPorDocumento(documento, token) {
+      // normalizo por si viene con puntos/guiones
+      const doc = String(documento).replace(/[.\-]/g, '').trim();
+      if (!doc) return null;
+
+      // OJO: si montaste el router con app.use('/api', router),
+      // la URL del front debe incluir /api:
+      const url = `${API}/api/propietarios/${encodeURIComponent(doc)}`;
+
+      const r = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (r.status === 404) return null;          // no encontrado
+      if (!r.ok) throw new Error(`HTTP ${r.status} ${r.statusText}`);
+
+      const data = await r.json();
+
+      // Si tu endpoint responde { id, persona, ... }:
+      return data ?? null;
+
+      // Si respondiera { propietario: { ... } }, usa:
+      // return data?.propietario ?? null;
+
+      // Si respondiera { items: [...] }, usa:
+      // return Array.isArray(data.items) ? data.items[0] ?? null : null;
+    }
+
+
+    async function apiCrearPropietarioConPersona(persona, token){
+      // Espera: POST /api/propietarios  body: { persona: {...} } -> { id, persona:{...} }
+      console.log(persona);
+      const r = await fetch(`${API}/api/propietario`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json', Authorization:`Bearer ${token}`},
+        body: JSON.stringify({ persona })
+      });
+      if(!r.ok) throw new Error(`HTTP ${r.status} al crear propietario`);
+      return r.json();
+    }
+
+    async function apiCrearMascota(payload, token){
+      const r = await fetch(`${API}/api/mascotas`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json', Authorization:`Bearer ${token}`},
+        body: JSON.stringify(payload)
+      });
+      if(!r.ok) throw new Error(`HTTP ${r.status} al crear mascota`);
+      return r.json();
+    }
+
+    // ---- UI logic ----
+    const docInput = document.getElementById('docProp');
+    const duenoIdHidden = document.getElementById('duenoId');
+    const estadoBusqueda = document.getElementById('estadoBusqueda');
+    const resumen = document.getElementById('propietarioResumen');
+    const resumenDatos = document.getElementById('propResumenDatos');
+    const crearWrap = document.getElementById('propietarioCrearWrap');
+    const btnBuscar = document.getElementById('btnBuscarProp');
+    const btnLimpiarBusqueda = document.getElementById('btnLimpiarBusqueda');
+
+    function mostrarResumenProp(p){
+      const per = p.persona || {};
+      resumenDatos.innerHTML = `
+        <div><strong>${(per.nombre||'').trim()} ${(per.apellido||'').trim()}</strong></div>
+        <div>Documento: ${per.documento || '-'}</div>
+        <div>Teléfono: ${per.telefono || '-'}</div>
+        <div>Email: ${per.email || '-'}</div>
+        <div>Dirección: ${per.direccion || '-'}</div>
+        <div class="mt-1"><span class="badge bg-success">ID Propietario: ${p.id}</span></div>
+      `;
+      resumen.style.display = 'block';
+    }
+
+    function ocultarResumenProp(){
+      resumen.style.display = 'none';
+      resumenDatos.innerHTML = '';
+    }
+
+    function mostrarCrearPropConDocumento(doc){
+      crearWrap.style.display = 'block';
+      // precompletar documento
+      document.getElementById('pNombre').value = '';
+      document.getElementById('pApellido').value = '';
+      document.getElementById('pTelefono').value = '';
+      document.getElementById('pEmail').value = '';
+      document.getElementById('pDireccion').value = '';
+      estadoBusqueda.textContent = `No existe propietario con documento ${doc}. Complete los datos para crear uno.`;
+    }
+
+    function ocultarCrearProp(){
+      crearWrap.style.display = 'none';
+      estadoBusqueda.textContent = '';
+    }
+
+    async function buscarPropietario(){
+      const token = localStorage.getItem('token');
+      if(!token){
+        showAlert('No hay sesión activa. Redirigiendo al login...', 'warning');
+        return setTimeout(()=>window.location.href='login.html',1500);
+      }
+      const doc = docInput.value.trim();
+      if(!doc){ docInput.classList.add('is-invalid'); return; }
+      docInput.classList.remove('is-invalid');
+
+      try{
+        estadoBusqueda.textContent = 'Buscando propietario...';
+        ocultarResumenProp(); ocultarCrearProp();
+        duenoIdHidden.value = '';
+
+        const p = await apiBuscarPropietarioPorDocumento(doc, token);
+        if(p){
+          duenoIdHidden.value = String(p.id);
+          mostrarResumenProp(p);
+          estadoBusqueda.textContent = 'Propietario encontrado ✔';
+        }else{
+          mostrarCrearPropConDocumento(doc);
+        }
+      }catch(err){
+        console.error(err);
+        estadoBusqueda.textContent = 'Error en la búsqueda';
+        showAlert(`Error al buscar propietario: ${err.message}`, 'danger');
+      }
+    }
+
+    btnBuscar.addEventListener('click', buscarPropietario);
+    docInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ e.preventDefault(); buscarPropietario(); }});
+    btnLimpiarBusqueda?.addEventListener('click', ()=>{
+      duenoIdHidden.value = '';
+      ocultarResumenProp();
+      ocultarCrearProp();
+      estadoBusqueda.textContent = '';
+      docInput.value = '';
+      docInput.focus();
+    });
+
+    // ---- Submit Mascota ----
+    document.getElementById('pacienteForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+
+      const token = localStorage.getItem('token');
+      if(!token){
+        showAlert('No hay sesión activa. Redirigiendo al login...', 'warning');
+        return setTimeout(()=>window.location.href='login.html',1500);
+      }
+
+      // Validación básica del paciente
+      const nombre = document.getElementById('nombre');
+      const especie = document.getElementById('especie');
+      if(!nombre.value.trim()){ nombre.classList.add('is-invalid'); return; }
+      if(!especie.value){ especie.classList.add('is-invalid'); return; }
+
+      const edad = document.getElementById('edad');
+      const peso = document.getElementById('peso');
+      if(edad.value && Number(edad.value) < 0){ edad.classList.add('is-invalid'); return; }
+      if(peso.value && Number(peso.value) < 0){ peso.classList.add('is-invalid'); return; }
+
+      // Debe existir propietario o subform lleno para crearlo
+      const duenoId = duenoIdHidden.value.trim();
+      const documento = docInput.value.trim();
+      if(!duenoId && !documento){
+        docInput.classList.add('is-invalid');
+        return;
+      }
+
+      try{
+        toggleLoading(true);
+
+        let finalDuenoId = duenoId ? Number(duenoId) : null;
+
+        // Si no existe propietario -> crear primero Propietario + Persona
+        if(!finalDuenoId){
+          const pNombre = document.getElementById('pNombre').value.trim();
+          const pTelefono = document.getElementById('pTelefono').value.trim();
+          if(!pNombre || !pTelefono){
+            showAlert('Complete al menos Nombre y Teléfono del propietario.', 'warning');
+            toggleLoading(false);
+            return;
+          }
+
+          const persona = {
+            nombre: pNombre,
+            apellido: document.getElementById('pApellido').value.trim() || null,
+            telefono: pTelefono,
+            email: document.getElementById('pEmail').value.trim() || null,
+            direccion: document.getElementById('pDireccion').value.trim() || null,
+            documento: documento
+          };
+
+          const nuevoProp = await apiCrearPropietarioConPersona(persona, token);
+          finalDuenoId = Number(nuevoProp.id);
+        }
+
+        // Crear Mascota
+        const payloadMascota = {
+          nombre: nombre.value.trim(),
+          especie: especie.value,
+          raza: document.getElementById('raza').value || null,
+          edad: edad.value ? Number(edad.value) : null,
+          peso: peso.value ? Number(peso.value) : null,
+          sexo: document.getElementById('sexo').value || null,
+          color: document.getElementById('color').value || null,
+          duenoId: finalDuenoId
+        };
+
+        const creada = await apiCrearMascota(payloadMascota, token);
+        showAlert(`Paciente "${creada.nombre || payloadMascota.nombre}" creado correctamente ✅`, 'success');
+        setTimeout(()=> window.location.href='mascotas.html', 1200);
+
+      }catch(err){
+        console.error(err);
+        showAlert(`Error al crear paciente: ${err.message}`, 'danger');
+      }finally{
+        toggleLoading(false);
+      }
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

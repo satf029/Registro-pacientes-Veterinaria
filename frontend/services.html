@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" />
+  <title>Servicios Veterinaria</title>
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Veterinaria</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item"><a class="nav-link active" href="#">Servicios</a></li>
+          <li class="nav-item"><a class="nav-link" href="usuarios.html">Usuarios</a></li>
+          <li class="nav-item"><a class="nav-link" href="mascotas.html">Pacientes</a></li>
+          <li class="nav-item"><a class="nav-link" href="medicamentos.html">Medicamentos</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Roles</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-4">
+    <!-- Lista de servicios -->
+    <div class="card shadow">
+      <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <h3 class="card-title mb-0">🩺 Lista de Servicios</h3>
+        <div>
+          <button type="button" class="btn btn-success me-2" onclick="exportarServicios()">⬇️ Exportar CSV</button>
+          <button type="button" class="btn btn-primary" onclick="createServicio()">➕ Agregar Servicio</button>
+        </div>
+      </div>
+
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-striped table-hover mb-0" id="servicios-table">
+            <thead class="table-dark">
+              <tr>
+                <th>ID</th>
+                <th>Fecha</th>
+                <th>Mascota</th>
+                <th>Tipo</th>
+                <th>Empleado</th>
+                <th>Estado</th>
+                <th>Precio</th>
+                <th>Observaciones</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="servicios-tbody">
+              <tr>
+                <td colspan="9" class="text-center py-4 text-muted">⏳ Cargando servicios...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <div class="d-flex justify-content-between align-items-center">
+          <small class="text-muted" id="totalServicios">Total: 0 servicios</small>
+          <div>
+            <span class="badge bg-secondary me-2">● Pendiente</span>
+            <span class="badge bg-info me-2">● En proceso</span>
+            <span class="badge bg-success me-2">● Completado</span>
+            <span class="badge bg-danger">● Cancelado</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alertita -->
+  <div class="alert alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+       role="alert" id="alertModal" style="display:none; z-index:1050;">
+    <span id="alertMessage"></span>
+    <button type="button" class="btn-close" onclick="hideAlert()"></button>
+  </div>
+
+  <script>
+    let token = "";
+    let serviciosCache = [];
+    let totalServicios = 0;
+
+    function createServicio() { window.location.href = "addservice.html"; }
+    function editServicio(id) { window.location.href = `editServicio.html?id=${id}`; }
+
+    function showAlert(message, type) {
+      const alertModal = document.getElementById('alertModal');
+      const alertMessage = document.getElementById('alertMessage');
+      alertModal.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+      alertMessage.textContent = message;
+      alertModal.style.display = 'block';
+      setTimeout(hideAlert, 4000);
+    }
+    function hideAlert() { document.getElementById('alertModal').style.display = 'none'; }
+
+    function estadoBadge(estado) {
+      switch (estado) {
+        case 'pendiente': return '<span class="badge bg-secondary">Pendiente</span>';
+        case 'en_proceso': return '<span class="badge bg-info">En proceso</span>';
+        case 'completado': return '<span class="badge bg-success">Completado</span>';
+        case 'cancelado': return '<span class="badge bg-danger">Cancelado</span>';
+        default: return `<span class="badge bg-dark">${estado || 'N/D'}</span>`;
+      }
+    }
+    function formatPrecio(v) { if (v==null) return '—'; const n=Number(v); return Number.isFinite(n)? n.toFixed(2): String(v); }
+    function formatFecha(f) { if (!f) return '—'; const d=new Date(f); return isNaN(d)? f : d.toLocaleString(); }
+
+    function renderServicios(items) {
+      const tbody = document.getElementById('servicios-tbody');
+      const totalEl = document.getElementById('totalServicios');
+
+      if (!items || items.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted">🔍 No hay servicios</td></tr>`;
+        totalEl.textContent = `Total: 0 servicios`;
+        return;
+      }
+
+      tbody.innerHTML = items.map(s => {
+        const mascotaTxt = s.mascota ? `${s.mascota.nombre} (ID ${s.mascota.id})` : '—';
+        const tipoTxt = s.tipoServicio ? s.tipoServicio.nombre : '—';
+        const empleadoTxt = s.empleado ? s.empleado.username : '—';
+
+        return `
+          <tr>
+            <td>${s.id}</td>
+            <td>${formatFecha(s.fecha)}</td>
+            <td>${mascotaTxt}</td>
+            <td>${tipoTxt}</td>
+            <td>${empleadoTxt}</td>
+            <td>${estadoBadge(s.estado)}</td>
+            <td>${formatPrecio(s.precio)}</td>
+            <td>${s.observaciones || '—'}</td>
+            <td>acciones…</td>
+          </tr>`;
+      }).join('');
+
+      totalEl.textContent = `Total: ${totalServicios} servicios`;
+    }
+
+    async function loadServicios() {
+      const jwt = localStorage.getItem("token");
+      const userId = localStorage.getItem("userId");
+
+      if (!jwt || !userId) {
+        showAlert("No hay sesión activa. Redirigiendo al login...", "warning");
+        setTimeout(() => window.location.href = "login.html", 1500);
+        return;
+      }
+
+      token = jwt;
+
+      try {
+        const res = await fetch(`http://localhost:3000/api/servicios`, {
+          headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }
+        });
+
+        if (!res.ok) throw new Error(await res.text() || "Error al listar servicios");
+
+        const data = await res.json();
+        serviciosCache = data.items || [];
+        totalServicios = data.total ?? serviciosCache.length;
+        renderServicios(serviciosCache);
+      } catch (err) {
+        showAlert(`Error al cargar servicios: ${err.message}`, "danger");
+        document.getElementById("servicios-tbody").innerHTML =
+          `<tr><td colspan="9" class="text-center py-4 text-danger">❌ ${err.message.replaceAll('<','&lt;')}</td></tr>`;
+      }
+    }
+
+    window.onload = () => loadServicios();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

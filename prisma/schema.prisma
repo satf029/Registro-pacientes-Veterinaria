@@ -192,6 +192,7 @@ model Medicamento {
   stock             Int    @default(0)
   precio            Float?
   requierePrescripcion Boolean @default(false)
+  fechaVencimiento DateTime?
   
   // Relaciones
   detalleServicios DetalleServicio[]

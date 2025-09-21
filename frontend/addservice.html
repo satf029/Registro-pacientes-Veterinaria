@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"/>
+  <title>Agregar Servicio</title>
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="services.html">Servicios</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="usuarios.html">Usuarios</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="mascotas.html">Pacientes</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="medicamentos.html">Medicamentos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Roles</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container mt-4">
+    <div class="row justify-content-center">
+      <div class="col-md-10">
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h3 class="card-title mb-0">🩺 Agregar Nuevo Servicio</h3>
+            <button type="button" class="btn btn-light btn-sm" onclick="volverAtras()">
+              ← Volver
+            </button>
+          </div>
+
+          <div class="card-body">
+            <form id="servicioForm" novalidate>
+              <div class="row g-3">
+                <!-- Información básica -->
+                <div class="col-12">
+                  <h5 class="text-primary mb-2">📋 Información Básica</h5>
+                </div>
+
+                <!-- Mascota -->
+                <div class="col-md-6">
+                  <label class="form-label">Mascota <span class="text-danger">*</span></label>
+                  <div id="mascotaSelectWrap">
+                    <select id="mascotaId" class="form-select" required></select>
+                  </div>
+                  <small class="text-muted" id="mascotaHelp"></small>
+                  <div class="invalid-feedback">Seleccione o ingrese el ID de la mascota.</div>
+                </div>
+
+                <!-- Tipo de Servicio -->
+                <div class="col-md-6">
+                  <label class="form-label">Tipo de Servicio <span class="text-danger">*</span></label>
+                  <div id="tipoSelectWrap">
+                    <select id="tipoServicioId" class="form-select" required></select>
+                  </div>
+                  <small class="text-muted" id="tipoHelp"></small>
+                  <div class="invalid-feedback">Seleccione o ingrese el ID del tipo de servicio.</div>
+                </div>
+
+                <!-- Empleado (opcional) -->
+                <div class="col-md-6">
+                  <label class="form-label">Empleado (opcional)</label>
+                  <div id="empleadoSelectWrap">
+                    <select id="empleadoId" class="form-select">
+                      <option value="">— Sin asignar —</option>
+                    </select>
+                  </div>
+                  <small class="text-muted" id="empleadoHelp"></small>
+                </div>
+
+                <!-- Fecha -->
+                <div class="col-md-3">
+                  <label class="form-label">Fecha</label>
+                  <input type="datetime-local" id="fecha" class="form-control"/>
+                  <small class="text-muted">Por defecto: ahora</small>
+                </div>
+
+                <!-- Estado -->
+                <div class="col-md-3">
+                  <label class="form-label">Estado</label>
+                  <select id="estado" class="form-select">
+                    <option value="pendiente" selected>Pendiente</option>
+                    <option value="en_proceso">En proceso</option>
+                    <option value="completado">Completado</option>
+                    <option value="cancelado">Cancelado</option>
+                  </select>
+                </div>
+
+                <!-- Precio -->
+                <div class="col-md-4">
+                  <label class="form-label">Precio</label>
+                  <input type="number" id="precio" class="form-control" step="0.01" min="0" placeholder="Ej: 120000"/>
+                  <div class="invalid-feedback">El precio no puede ser negativo.</div>
+                </div>
+
+                <!-- Observaciones -->
+                <div class="col-12">
+                  <label class="form-label">Observaciones</label>
+                  <textarea id="observaciones" class="form-control" rows="3" placeholder="Notas, indicaciones, etc."></textarea>
+                </div>
+
+                <!-- Detalle de medicamentos (opcional) -->
+                <div class="col-12 mt-3">
+                  <h5 class="text-primary mb-2">💊 Detalle de Medicamentos (opcional)</h5>
+                  <div class="table-responsive">
+                    <table class="table table-bordered align-middle mb-2">
+                      <thead class="table-light">
+                        <tr>
+                          <th style="width: 20%">Medicamento ID</th>
+                          <th style="width: 20%">Cantidad</th>
+                          <th style="width: 40%">Dosis / Indicaciones</th>
+                          <th style="width: 20%">Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody id="detalleBody">
+                        <!-- filas dinámicas -->
+                      </tbody>
+                    </table>
+                  </div>
+                  <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarFilaDetalle()">➕ Agregar línea</button>
+                  <small class="text-muted d-block mt-1">Dejá vacío si no corresponde.</small>
+                </div>
+
+                <!-- Botones -->
+                <div class="col-12 mt-3 d-flex justify-content-end gap-2">
+                  <button type="button" class="btn btn-secondary" onclick="volverAtras()">Cancelar</button>
+                  <button type="submit" class="btn btn-primary" id="submitBtn">
+                    <span class="spinner-border spinner-border-sm d-none" id="loadingSpinner"></span>
+                    💾 Guardar Servicio
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alertita -->
+  <div class="alert alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
+       role="alert" id="alertModal" style="display:none; z-index:1050;">
+    <span id="alertMessage"></span>
+    <button type="button" class="btn-close" onclick="hideAlert()"></button>
+  </div>
+
+  <script>
+    const API = 'http://localhost:3000';
+    const ESTADOS = ['pendiente','en_proceso','completado','cancelado'];
+
+    function volverAtras(){ window.location.href = 'services.html'; }
+    function showAlert(message, type){
+      const m=document.getElementById('alertModal'), t=document.getElementById('alertMessage');
+      m.className=`alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+      t.textContent=message; m.style.display='block'; setTimeout(hideAlert, 4000);
+    }
+    function hideAlert(){ document.getElementById('alertModal').style.display='none'; }
+    function toggleLoading(show){
+      const sp=document.getElementById('loadingSpinner'), btn=document.getElementById('submitBtn');
+      if(show){ sp.classList.remove('d-none'); btn.disabled=true; } else { sp.classList.add('d-none'); btn.disabled=false; }
+    }
+
+    // ----- Detalle dinámico -----
+    function agregarFilaDetalle(medId='', cant='', dosis=''){
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="number" class="form-control" placeholder="ID" value="${medId}"></td>
+        <td><input type="number" class="form-control" placeholder="Cant." min="0" step="0.01" value="${cant}"></td>
+        <td><input type="text" class="form-control" placeholder="Ej: 500mg cada 8h" value="${dosis}"></td>
+        <td><button type="button" class="btn btn-outline-danger btn-sm" onclick="this.closest('tr').remove()">🗑️ Quitar</button></td>
+      `;
+      document.getElementById('detalleBody').appendChild(tr);
+    }
+
+    async function tryLoadSelect(url, selectEl, mapFn, placeholder='Seleccionar...'){
+      try{
+        const token = localStorage.getItem('token'); if(!token) throw new Error('No token');
+        const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` }});
+        if(!res.ok) throw new Error(String(res.status));
+        const data = await res.json();
+        selectEl.innerHTML = `<option value="">${placeholder}</option>` + data.items.map(mapFn).join('');
+        return true;
+      }catch(_){
+        return false;
+      }
+    }
+
+    function degradeToNumeric(wrapperId, inputId, helpId, label){
+      const wrap = document.getElementById(wrapperId);
+      wrap.innerHTML = `<input type="number" class="form-control" id="${inputId}" placeholder="Ingrese ID de ${label}" required>`;
+      const help = document.getElementById(helpId);
+      if(help) help.textContent = `No se pudo cargar el listado de ${label.toLowerCase()}. Ingrese el ID manualmente.`;
+    }
+
+    async function initCombos(){
+      const mascotaOk = await tryLoadSelect(
+        `${API}/api/pacientes`,
+        document.getElementById('mascotaId'),
+        (m)=>`<option value="${m.id}">${m.nombre} (#${m.id})</option>`,
+        'Seleccionar mascota'
+      );
+      if(!mascotaOk) degradeToNumeric('mascotaSelectWrap','mascotaId','mascotaHelp','Mascota');
+
+      const tipoOk = await tryLoadSelect(
+        `${API}/api/tipos-servicio`,
+        document.getElementById('tipoServicioId'),
+        (t)=>`<option value="${t.id}">${t.nombre} (#${t.id})</option>`,
+        'Seleccionar tipo'
+      );
+      if(!tipoOk) degradeToNumeric('tipoSelectWrap','tipoServicioId','tipoHelp','Tipo de Servicio');
+
+      const empleadoOk = await tryLoadSelect(
+        `${API}/api/usuarios`,
+        document.getElementById('empleadoId'),
+        (u)=>`<option value="${u.id}">${u.username} (#${u.id})</option>`,
+        'Seleccionar empleado (opcional)'
+      );
+      if(!empleadoOk) degradeToNumeric('empleadoSelectWrap','empleadoId','empleadoHelp','Empleado');
+    }
+
+    // ----- Submit -----
+    document.getElementById('servicioForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const token = localStorage.getItem('token');
+      if(!token){
+        showAlert('No hay sesión activa. Redirigiendo al login...', 'warning');
+        return setTimeout(()=>window.location.href='login.html', 1500);
+      }
+
+      // validaciones básicas
+      const mascotaIdEl = document.getElementById('mascotaId');
+      const tipoIdEl = document.getElementById('tipoServicioId');
+      if(!mascotaIdEl.value){ mascotaIdEl.classList.add('is-invalid'); return; }
+      if(!tipoIdEl.value){ tipoIdEl.classList.add('is-invalid'); return; }
+
+      const fechaVal = document.getElementById('fecha').value; // opcional
+      const estadoVal = document.getElementById('estado').value || 'pendiente';
+      if(!ESTADOS.includes(estadoVal)){ showAlert('Estado inválido', 'danger'); return; }
+
+      const precioEl = document.getElementById('precio');
+      if(precioEl.value && Number(precioEl.value) < 0){
+        precioEl.classList.add('is-invalid'); return;
+      }
+
+      // detalle
+      const detalle = [];
+      document.querySelectorAll('#detalleBody tr').forEach(tr=>{
+        const [medIdEl, cantEl, dosisEl] = tr.querySelectorAll('input');
+        const mid = medIdEl.value.trim();
+        const cant = cantEl.value.trim();
+        const dos = dosisEl.value.trim();
+        if(mid !== ''){
+          detalle.push({
+            medicamentoId: Number(mid),
+            cantidad: cant === '' ? null : Number(cant),
+            dosis: dos || null
+          });
+        }
+      });
+
+      const payload = {
+        mascotaId: Number(mascotaIdEl.value),
+        tipoServicioId: Number(tipoIdEl.value),
+        empleadoId: document.getElementById('empleadoId').value ? Number(document.getElementById('empleadoId').value) : null,
+        fecha: fechaVal ? new Date(fechaVal).toISOString() : undefined, // backend puede default(now())
+        estado: estadoVal,                    // tu modelo lo defaulta a "pendiente", pero lo enviamos si se cambió
+        precio: precioEl.value ? Number(precioEl.value) : null,
+        observaciones: document.getElementById('observaciones').value || null,
+        detalleServicios: detalle.length ? detalle : undefined
+      };
+
+      try{
+        toggleLoading(true);
+        const res = await fetch(`${API}/api/servicios`, {
+          method: 'POST',
+          headers: {
+            'Content-Type':'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if(res.status === 401){
+          showAlert('Sesión expirada. Redirigiendo al login...', 'warning');
+          localStorage.removeItem('token'); localStorage.removeItem('userId');
+          return setTimeout(()=>window.location.href='login.html', 1500);
+        }
+
+        if(!res.ok){
+          const txt = await res.text().catch(()=> '');
+          throw new Error(`HTTP ${res.status} ${res.statusText}\n${txt}`);
+        }
+
+        const data = await res.json();
+        showAlert(`Servicio #${data.id || ''} creado correctamente ✅`, 'success');
+        setTimeout(()=> window.location.href='services.html', 1200);
+
+      }catch(err){
+        console.error(err);
+        showAlert(`Error al crear servicio: ${err.message}`, 'danger');
+      }finally{
+        toggleLoading(false);
+      }
+    });
+
+    // init
+    window.addEventListener('load', ()=>{
+      agregarFilaDetalle(); // deja una línea vacía por defecto
+      initCombos();         // intenta cargar listas; si fallan, degrada a inputs
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

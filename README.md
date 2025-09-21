@@ -2,6 +2,7 @@
 # Registro de Pacientes de Veterinaria
 
 ##Endpoints disponibles
+
 GET api/clima/params
 GET api/users
 GET api/users/:id

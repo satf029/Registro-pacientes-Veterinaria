@@ -11,21 +11,11 @@
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
       <ul class="navbar-nav mx-auto">
-        <li class="nav-item active">
-          <a class="nav-link" href="services.html">Servicios</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="usuarios.html">Usuarios</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="mascotas.html">Pacientes</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="medicamentos.html">Medicamentos</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Roles</a>
-        </li>
+        <li class="nav-item active"><a class="nav-link" href="services.html">Servicios</a></li>
+        <li class="nav-item"><a class="nav-link" href="usuarios.html">Usuarios</a></li>
+        <li class="nav-item"><a class="nav-link" href="mascotas.html">Pacientes</a></li>
+        <li class="nav-item"><a class="nav-link" href="medicamentos.html">Medicamentos</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Roles</a></li>
       </ul>
     </div>
   </nav>
@@ -36,9 +26,7 @@
         <div class="card shadow">
           <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h3 class="card-title mb-0">🩺 Agregar Nuevo Servicio</h3>
-            <button type="button" class="btn btn-light btn-sm" onclick="volverAtras()">
-              ← Volver
-            </button>
+            <button type="button" class="btn btn-light btn-sm" onclick="volverAtras()">← Volver</button>
           </div>
 
           <div class="card-body">
@@ -56,28 +44,14 @@
                     <select id="mascotaId" class="form-select" required></select>
                   </div>
                   <small class="text-muted" id="mascotaHelp"></small>
-                  <div class="invalid-feedback">Seleccione o ingrese el ID de la mascota.</div>
+                  <div class="invalid-feedback">Seleccione la mascota.</div>
                 </div>
 
                 <!-- Tipo de Servicio -->
                 <div class="col-md-6">
                   <label class="form-label">Tipo de Servicio <span class="text-danger">*</span></label>
-                  <div id="tipoSelectWrap">
-                    <select id="tipoServicioId" class="form-select" required></select>
-                  </div>
-                  <small class="text-muted" id="tipoHelp"></small>
-                  <div class="invalid-feedback">Seleccione o ingrese el ID del tipo de servicio.</div>
-                </div>
-
-                <!-- Empleado (opcional) -->
-                <div class="col-md-6">
-                  <label class="form-label">Empleado (opcional)</label>
-                  <div id="empleadoSelectWrap">
-                    <select id="empleadoId" class="form-select">
-                      <option value="">— Sin asignar —</option>
-                    </select>
-                  </div>
-                  <small class="text-muted" id="empleadoHelp"></small>
+                  <input type="text" id="tipoServicio" class="form-control" placeholder="Ej: Baño, Peluquería, Consulta Médica" required>
+                  <div class="invalid-feedback">Ingrese el tipo de servicio.</div>
                 </div>
 
                 <!-- Fecha -->
@@ -111,7 +85,7 @@
                   <textarea id="observaciones" class="form-control" rows="3" placeholder="Notas, indicaciones, etc."></textarea>
                 </div>
 
-                <!-- Detalle de medicamentos (opcional) -->
+                <!-- Detalle de medicamentos -->
                 <div class="col-12 mt-3">
                   <h5 class="text-primary mb-2">💊 Detalle de Medicamentos (opcional)</h5>
                   <div class="table-responsive">
@@ -172,7 +146,7 @@
       if(show){ sp.classList.remove('d-none'); btn.disabled=true; } else { sp.classList.add('d-none'); btn.disabled=false; }
     }
 
-    // ----- Detalle dinámico -----
+    // --- detalle dinámico ---
     function agregarFilaDetalle(medId='', cant='', dosis=''){
       const tr = document.createElement('tr');
       tr.innerHTML = `
@@ -190,62 +164,31 @@
         const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` }});
         if(!res.ok) throw new Error(String(res.status));
         const data = await res.json();
-        selectEl.innerHTML = `<option value="">${placeholder}</option>` + data.items.map(mapFn).join('');
+        const list = Array.isArray(data) ? data : (data.items || []);
+        selectEl.innerHTML = `<option value="">${placeholder}</option>` + list.map(mapFn).join('');
         return true;
       }catch(_){
         return false;
       }
     }
 
-    function degradeToNumeric(wrapperId, inputId, helpId, label){
-      const wrap = document.getElementById(wrapperId);
-      wrap.innerHTML = `<input type="number" class="form-control" id="${inputId}" placeholder="Ingrese ID de ${label}" required>`;
-      const help = document.getElementById(helpId);
-      if(help) help.textContent = `No se pudo cargar el listado de ${label.toLowerCase()}. Ingrese el ID manualmente.`;
-    }
-
-    async function initCombos(){
-      const mascotaOk = await tryLoadSelect(
-        `${API}/api/pacientes`,
-        document.getElementById('mascotaId'),
-        (m)=>`<option value="${m.id}">${m.nombre} (#${m.id})</option>`,
-        'Seleccionar mascota'
-      );
-      if(!mascotaOk) degradeToNumeric('mascotaSelectWrap','mascotaId','mascotaHelp','Mascota');
-
-      const tipoOk = await tryLoadSelect(
-        `${API}/api/tipos-servicio`,
-        document.getElementById('tipoServicioId'),
-        (t)=>`<option value="${t.id}">${t.nombre} (#${t.id})</option>`,
-        'Seleccionar tipo'
-      );
-      if(!tipoOk) degradeToNumeric('tipoSelectWrap','tipoServicioId','tipoHelp','Tipo de Servicio');
-
-      const empleadoOk = await tryLoadSelect(
-        `${API}/api/usuarios`,
-        document.getElementById('empleadoId'),
-        (u)=>`<option value="${u.id}">${u.username} (#${u.id})</option>`,
-        'Seleccionar empleado (opcional)'
-      );
-      if(!empleadoOk) degradeToNumeric('empleadoSelectWrap','empleadoId','empleadoHelp','Empleado');
-    }
-
-    // ----- Submit -----
+    // --- Submit ---
     document.getElementById('servicioForm').addEventListener('submit', async (e)=>{
       e.preventDefault();
       const token = localStorage.getItem('token');
-      if(!token){
+      const empleadoId = localStorage.getItem('userId'); // 👈 empleado = usuario logueado
+      if(!token || !empleadoId){
         showAlert('No hay sesión activa. Redirigiendo al login...', 'warning');
-        return setTimeout(()=>window.location.href='login.html', 1500);
+        return setTimeout(()=>window.location.href='login.html',1500);
       }
 
-      // validaciones básicas
+      // validaciones
       const mascotaIdEl = document.getElementById('mascotaId');
-      const tipoIdEl = document.getElementById('tipoServicioId');
+      const tipoEl = document.getElementById('tipoServicio');
       if(!mascotaIdEl.value){ mascotaIdEl.classList.add('is-invalid'); return; }
-      if(!tipoIdEl.value){ tipoIdEl.classList.add('is-invalid'); return; }
+      if(!tipoEl.value.trim()){ tipoEl.classList.add('is-invalid'); return; }
 
-      const fechaVal = document.getElementById('fecha').value; // opcional
+      const fechaVal = document.getElementById('fecha').value;
       const estadoVal = document.getElementById('estado').value || 'pendiente';
       if(!ESTADOS.includes(estadoVal)){ showAlert('Estado inválido', 'danger'); return; }
 
@@ -272,10 +215,10 @@
 
       const payload = {
         mascotaId: Number(mascotaIdEl.value),
-        tipoServicioId: Number(tipoIdEl.value),
-        empleadoId: document.getElementById('empleadoId').value ? Number(document.getElementById('empleadoId').value) : null,
-        fecha: fechaVal ? new Date(fechaVal).toISOString() : undefined, // backend puede default(now())
-        estado: estadoVal,                    // tu modelo lo defaulta a "pendiente", pero lo enviamos si se cambió
+        tipoServicio: tipoEl.value.trim(),      // 👈 texto
+        empleadoId: Number(empleadoId),         // 👈 localStorage
+        fecha: fechaVal ? new Date(fechaVal).toISOString() : undefined,
+        estado: estadoVal,
         precio: precioEl.value ? Number(precioEl.value) : null,
         observaciones: document.getElementById('observaciones').value || null,
         detalleServicios: detalle.length ? detalle : undefined
@@ -295,7 +238,7 @@
         if(res.status === 401){
           showAlert('Sesión expirada. Redirigiendo al login...', 'warning');
           localStorage.removeItem('token'); localStorage.removeItem('userId');
-          return setTimeout(()=>window.location.href='login.html', 1500);
+          return setTimeout(()=>window.location.href='login.html',1500);
         }
 
         if(!res.ok){
@@ -317,8 +260,9 @@
 
     // init
     window.addEventListener('load', ()=>{
-      agregarFilaDetalle(); // deja una línea vacía por defecto
-      initCombos();         // intenta cargar listas; si fallan, degrada a inputs
+      agregarFilaDetalle();
+      tryLoadSelect(`${API}/api/mascotas`, document.getElementById('mascotaId'),
+        (m)=> `<option value="${m.id}">${m.nombre} (#${m.id})</option>`, 'Seleccionar mascota');
     });
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>

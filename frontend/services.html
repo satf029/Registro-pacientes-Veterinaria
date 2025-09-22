@@ -32,7 +32,7 @@
       <div class="card-header bg-light d-flex justify-content-between align-items-center">
         <h3 class="card-title mb-0">🩺 Lista de Servicios</h3>
         <div>
-          <button type="button" class="btn btn-success me-2" onclick="exportarServicios()">⬇️ Exportar CSV</button>
+          <button type="button" class="btn btn-success me-2" onclick="Reporte()">⬇️ Reporte</button>
           <button type="button" class="btn btn-primary" onclick="createServicio()">➕ Agregar Servicio</button>
         </div>
       </div>
@@ -88,7 +88,7 @@
     let serviciosCache = [];
     let totalServicios = 0;
 
-    function createServicio() { window.location.href = "addservice.html"; }
+    function createServicio() { window.location.href = "addservice.html"; } // ojo al nombre del archivo
     function editServicio(id) { window.location.href = `editServicio.html?id=${id}`; }
 
     function showAlert(message, type) {
@@ -124,9 +124,11 @@
       }
 
       tbody.innerHTML = items.map(s => {
-        const mascotaTxt = s.mascota ? `${s.mascota.nombre} (ID ${s.mascota.id})` : '—';
-        const tipoTxt = s.tipoServicio ? s.tipoServicio.nombre : '—';
-        const empleadoTxt = s.empleado ? s.empleado.username : '—';
+        // defensivo por si el include no vino
+        const mascotaTxt = s.mascota ? `${s.mascota.nombre} (ID ${s.mascota.id})` : (s.mascotaId ? `ID ${s.mascotaId}` : '—');
+        const tipoTxt = s.tipoServicio?.nombre || s.tipo || '—'; // si tu controller devuelve include: { tipoServicio }, usamos nombre
+        const precioTxt = s.tipoServicio.precio;
+        const empleadoTxt = s.empleado?.username || (s.empleadoId ? `ID ${s.empleadoId}` : '—');
 
         return `
           <tr>
@@ -136,13 +138,13 @@
             <td>${tipoTxt}</td>
             <td>${empleadoTxt}</td>
             <td>${estadoBadge(s.estado)}</td>
-            <td>${formatPrecio(s.precio)}</td>
+            <td>${formatPrecio(precioTxt)}</td>
             <td>${s.observaciones || '—'}</td>
-            <td>acciones…</td>
+            <td>—</td>
           </tr>`;
       }).join('');
 
-      totalEl.textContent = `Total: ${totalServicios} servicios`;
+      totalEl.textContent = `Total: ${items.length} servicios`;
     }
 
     async function loadServicios() {
@@ -165,18 +167,24 @@
         if (!res.ok) throw new Error(await res.text() || "Error al listar servicios");
 
         const data = await res.json();
-        serviciosCache = data.items || [];
-        totalServicios = data.total ?? serviciosCache.length;
+        // Soporta ambos formatos: array o { items, total, ... }
+        const list = Array.isArray(data) ? data : (data.items || []);
+        serviciosCache = list;
+        totalServicios = Array.isArray(data) ? list.length : (data.total ?? list.length);
+
         renderServicios(serviciosCache);
       } catch (err) {
         showAlert(`Error al cargar servicios: ${err.message}`, "danger");
         document.getElementById("servicios-tbody").innerHTML =
-          `<tr><td colspan="9" class="text-center py-4 text-danger">❌ ${err.message.replaceAll('<','&lt;')}</td></tr>`;
+          `<tr><td colspan="9" class="text-center py-4 text-danger">❌ ${String(err.message).replaceAll('<','&lt;')}</td></tr>`;
       }
     }
 
+    function Reporte(){window.location.href = "repote.html"; }
+
     window.onload = () => loadServicios();
   </script>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -1,124 +1,412 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
-    <title>Reporte del Clima</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"/>
+  <title>Reporte Diario</title>
+  <!-- Chart.js para gráficas -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 </head>
 <body>
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card shadow">
-                    <div class="card-header bg-primary text-white">
-                        <h3 class="mb-0">Reporte</h3>
-                    </div>
-                    <div class="card-body">
-                        <form id="weatherForm">
-                            <div class="mb-3">
-                                <label for="date" class="form-label">Fecha</label>
-                                <input type="date" class="form-control" id="date" name="date" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100">Enviar</button>
-                        </form>
-                    </div>
-                </div>
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-10">
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
+            <h3 class="mb-0">📊 Reporte Diario</h3>
+            <button class="btn btn-light btn-sm" onclick="window.history.back()">← Volver</button>
+          </div>
+          <div class="card-body">
+            <form id="reportForm" class="row g-3">
+              <div class="col-md-4">
+                <label for="date" class="form-label">Fecha</label>
+                <input type="date" class="form-control" id="date" name="date" required>
+              </div>
+              <div class="col-md-4">
+                <label for="city" class="form-label">Ciudad (clima)</label>
+                <input type="text" id="city" class="form-control" value="Aregua">
+              </div>
+              <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Generar reporte</button>
+              </div>
+            </form>
 
-                <!-- Resultados -->
-                <div id="results" class="mt-4" style="display: none;">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5>Clima</h5>
-                            <div id="weatherData"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Loading -->
-                <div id="loading" class="mt-4 text-center" style="display: none;">
-                    <div class="spinner-border" role="status"></div>
-                    <p>Cargando...</p>
-                </div>
+            <!-- Loading -->
+            <div id="loading" class="mt-4 text-center" style="display:none;">
+              <div class="spinner-border" role="status"></div>
+              <p class="mb-0 mt-2">Cargando...</p>
             </div>
+
+            <!-- KPIs -->
+            <div id="kpis" class="row g-3 mt-4" style="display:none;">
+              <div class="col-md-3">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <div class="text-muted small">🌡️ Temp. Máxima</div>
+                    <div id="kpiTmax" class="h4 mb-0">—</div>
+                    <div id="kpiLoc" class="small text-muted">—</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <div class="text-muted small">🌡️ Temp. Mínima</div>
+                    <div id="kpiTmin" class="h4 mb-0">—</div>
+                    <div id="kpiDate" class="small text-muted">—</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <div class="text-muted small">🧾 Servicios Atendidos</div>
+                    <div id="kpiCount" class="h4 mb-0">0</div>
+                    <div class="small text-muted">Excluye cancelados</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <div class="text-muted small">💰 Ingreso Máximo</div>
+                    <div id="kpiMax" class="h4 mb-0">0</div>
+                    <div class="small text-muted">Mayor ticket del día</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Gráficas -->
+            <div id="chartsWrap" class="row g-3 mt-3" style="display:none;">
+              <div class="col-md-8">
+                <div class="card">
+                  <div class="card-body">
+                    <h6 class="mb-3">💵 Ingresos por tipo de servicio</h6>
+                    <canvas id="chartIngresos"></canvas>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card">
+                  <div class="card-body">
+                    <h6 class="mb-3">📈 Cantidad por tipo</h6>
+                    <canvas id="chartCantidad"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Resultados Clima -->
+            <div id="weatherCard" class="card mt-3" style="display:none;">
+              <div class="card-body">
+                <h5>Clima</h5>
+                <div id="weatherData"></div>
+              </div>
+            </div>
+
+            <!-- Tabla de servicios -->
+            <div id="servicesWrap" class="card mt-3" style="display:none;">
+              <div class="card-body">
+                <h5 class="mb-3">Servicios del día</h5>
+                <div class="table-responsive">
+                  <table class="table table-striped table-hover">
+                    <thead class="table-light">
+                      <tr>
+                        <th>#</th>
+                        <th>Hora</th>
+                        <th>Mascota</th>
+                        <th>Tipo</th>
+                        <th>Estado</th>
+                        <th>Precio (tipo)</th>
+                        <th>Empleado</th>
+                      </tr>
+                    </thead>
+                    <tbody id="servicesBody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Alertas -->
+            <div id="alerta" class="alert alert-danger mt-3" style="display:none;"></div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 
-    <script>
-        // Establecer fecha de hoy por defecto
-        document.getElementById('date').valueAsDate = new Date();
+<script>
+  const API = 'http://localhost:3000';
+  let chartIngresos, chartCantidad;
 
-        document.getElementById('weatherForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const token = localStorage.getItem("token");
-            
-            if (!token) {
-                alert("No hay sesión activa. Redirigiendo al login...");
-                window.location.href = "login.html";
-                return;
-            }
-            
-            const date = document.getElementById('date').value;
-            const loading = document.getElementById('loading');
-            const results = document.getElementById('results');
-            
-            // Mostrar loading
-            loading.style.display = 'block';
-            results.style.display = 'none';
+  // Fecha de hoy por defecto
+  (function initDate(){
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    document.getElementById('date').value = `${yyyy}-${mm}-${dd}`;
+  })();
 
-            try {
-                const params = new URLSearchParams({
-                    city: 'Aregua',
-                    date: date
-                });
+  document.getElementById('reportForm').addEventListener('submit', onSubmit);
 
-                const response = await fetch(`http://localhost:3000/api/clima?${params}`);
+  async function onSubmit(e){
+    e.preventDefault();
+    const token = localStorage.getItem('token');
+    if(!token){
+      alert('No hay sesión activa. Redirigiendo al login...');
+      return (window.location.href='login.html');
+    }
 
-                if (response.status === 403) {
-                    document.getElementById('weatherData').innerHTML = `
-                        <p class="text-danger">Error 403: El endpoint /api/weather no existe o no tienes permisos</p>
-                    `;
-                    results.style.display = 'block';
-                    loading.style.display = 'none';
-                    return;
-                }
+    const date = document.getElementById('date').value; // YYYY-MM-DD
+    const city = document.getElementById('city').value || 'Aregua';
 
-                if (response.status === 401) {
-                    alert("Sesión expirada. Redirigiendo al login...");
-                    localStorage.removeItem("token");
-                    localStorage.removeItem("userId");
-                    window.location.href = "login.html";
-                    return;
-                }
+    if(!date){
+      return showAlert('Seleccione una fecha');
+    }
 
-                const data = await response.json();
-                console.log(data.data);
-                if (data.data.found) {
-                    document.getElementById('weatherData').innerHTML = `
-                        <p><strong>Ubicación:</strong> ${data.data.location}</p>
-                        <p><strong>Fecha:</strong> ${data.data.date}</p>
-                        <p><strong>Temperatura máxima:</strong> ${data.data.tmax}°C</p>
-                        <p><strong>Temperatura mínima:</strong> ${data.data.tmin}°C</p>
-                        <p><strong>Precipitación:</strong> ${data.data.precipitation} mm</p>
-                    `;
-                } else {
-                    document.getElementById('weatherData').innerHTML = `
-                        <p class="text-danger">${data.message}</p>
-                    `;
-                }
+    // UI
+    setLoading(true);
+    hideAlert();
+    hideAllSections();
 
-                results.style.display = 'block';
-            } catch (error) {
-                document.getElementById('weatherData').innerHTML = `
-                    <p class="text-danger">Error: ${error.message}</p>
-                `;
-                results.style.display = 'block';
-            }
+    try{
+      // Cargar clima
+      const clima = await fetchClima(city, date);
 
-            loading.style.display = 'none';
-        });
-    </script>
+      // Cargar servicios (array). Si tu backend acepta filtros por fecha, usa la versión con query params comentada abajo.
+      const servicios = await fetchServicios(token);
+      const delDia = filtrarServiciosPorFecha(servicios, date);
+
+      // KPIs
+      const {countAtendidos, totalIngresos, maxTicket, porTipo} = calcularKPIs(delDia);
+      pintarClima(clima);
+      pintarKPIs(clima, countAtendidos, maxTicket, date);
+      pintarTabla(delDia);
+      pintarGraficas(porTipo);
+
+      // Mostrar secciones
+      document.getElementById('kpis').style.display = 'flex';
+      document.getElementById('weatherCard').style.display = 'block';
+      document.getElementById('servicesWrap').style.display = 'block';
+      document.getElementById('chartsWrap').style.display = 'flex';
+    }catch(err){
+      showAlert(err.message || String(err));
+    }finally{
+      setLoading(false);
+    }
+  }
+
+  function setLoading(show){
+    document.getElementById('loading').style.display = show? 'block':'none';
+  }
+  function hideAllSections(){
+    document.getElementById('kpis').style.display = 'none';
+    document.getElementById('weatherCard').style.display = 'none';
+    document.getElementById('servicesWrap').style.display = 'none';
+    document.getElementById('chartsWrap').style.display = 'none';
+  }
+  function showAlert(msg){
+    const a = document.getElementById('alerta');
+    a.textContent = msg;
+    a.style.display = 'block';
+  }
+  function hideAlert(){
+    document.getElementById('alerta').style.display = 'none';
+  }
+
+  // ---------- Fetchers ----------
+  async function fetchClima(city, date){
+    const params = new URLSearchParams({ city, date });
+    const r = await fetch(`${API}/api/clima?${params.toString()}`);
+    if(!r.ok){
+      const txt = await r.text().catch(()=> '');
+      throw new Error(`Error al obtener clima: ${r.status} ${r.statusText} ${txt}`);
+    }
+    const data = await r.json();
+    return data?.data || { found:false };
+  }
+
+  async function fetchServicios(token){
+    // Si tu backend acepta filtros: usa esto (y comenta las 2 líneas de abajo):
+    // const desde = new Date(document.getElementById('date').value + 'T00:00:00');
+    // const hasta = new Date(document.getElementById('date').value + 'T23:59:59');
+    // const qs = new URLSearchParams({ desde: desde.toISOString(), hasta: hasta.toISOString() });
+    // const url = `${API}/api/servicios?${qs.toString()}`;
+
+    const url = `${API}/api/servicios`; // ← sin filtros; filtramos en el front por fecha
+    const r = await fetch(url, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if(!r.ok){
+      const txt = await r.text().catch(()=> '');
+      throw new Error(`Error al obtener servicios: ${r.status} ${r.statusText} ${txt}`);
+    }
+    const data = await r.json();
+    return Array.isArray(data) ? data : (data.items || []);
+  }
+
+  // ---------- Helpers de negocio ----------
+  function esMismaFecha(iso, yyyyMMDD){
+    if(!iso) return false;
+    const d = new Date(iso);
+    if(Number.isNaN(d.getTime())) return false;
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${dd}` === yyyyMMDD;
+  }
+
+  function filtrarServiciosPorFecha(servicios, yyyyMMDD){
+    // excluimos cancelados para contar “atendidos”
+    return servicios.filter(s => esMismaFecha(s.fecha, yyyyMMDD));
+  }
+
+  function precioTipo(s){
+    // usar precio del tipo de servicio si viene incluido; si no, cae a s.precio
+    if (s?.tipoServicio?.precio != null) return Number(s.tipoServicio.precio) || 0;
+    return Number(s.precio) || 0;
+  }
+
+  function calcularKPIs(servicios){
+    // cantidad atendidos (no cancelados)
+    const atendidos = servicios.filter(s => s.estado !== 'cancelado');
+    const countAtendidos = atendidos.length;
+
+    // ingresos: solo completados (puedes cambiarlo a != cancelado si preferís)
+    const completados = servicios.filter(s => s.estado === 'completado');
+    const importes = completados.map(precioTipo);
+    const totalIngresos = importes.reduce((a,b)=> a + (Number(b)||0), 0);
+
+    // ticket máximo del día (entre completados; si querés entre todos, cambia 'completados' por 'servicios')
+    const maxTicket = importes.length ? Math.max(...importes) : 0;
+
+    // agregación por tipo para gráficas (usa nombre del tipo si está incluido)
+    const porTipo = {};
+    for(const s of servicios){
+      const tipoNombre = s?.tipoServicio?.nombre || s.tipo || 'Sin tipo';
+      const p = precioTipo(s);
+      if(!porTipo[tipoNombre]) porTipo[tipoNombre] = { cantidad:0, ingresos:0 };
+      porTipo[tipoNombre].cantidad += (s.estado !== 'cancelado') ? 1 : 0; // contamos atendidos
+      porTipo[tipoNombre].ingresos += (s.estado === 'completado') ? p : 0;
+    }
+
+    return { countAtendidos, totalIngresos, maxTicket, porTipo };
+  }
+
+  // ---------- Pintado UI ----------
+  function pintarClima(c){
+    const card = document.getElementById('weatherCard');
+    const box = document.getElementById('weatherData');
+    if(!c?.found){
+      box.innerHTML = `<p class="text-danger mb-0">No se encontró clima para la fecha/ciudad.</p>`;
+    }else{
+      box.innerHTML = `
+        <p class="mb-1"><strong>Ubicación:</strong> ${c.location}</p>
+        <p class="mb-1"><strong>Fecha:</strong> ${c.date}</p>
+        <p class="mb-1"><strong>Temp. Máxima:</strong> ${c.tmax}°C</p>
+        <p class="mb-0"><strong>Temp. Mínima:</strong> ${c.tmin}°C</p>
+      `;
+    }
+    card.style.display = 'block';
+  }
+
+  function pintarKPIs(clima, countAtendidos, maxTicket, yyyyMMDD){
+    document.getElementById('kpiTmax').textContent = clima?.tmax != null ? `${clima.tmax}°C` : '—';
+    document.getElementById('kpiTmin').textContent = clima?.tmin != null ? `${clima.tmin}°C` : '—';
+    document.getElementById('kpiLoc').textContent  = clima?.location || '—';
+    document.getElementById('kpiDate').textContent = yyyyMMDD;
+    document.getElementById('kpiCount').textContent = countAtendidos;
+    document.getElementById('kpiMax').textContent = formatearGs(maxTicket);
+  }
+
+  function formatearGs(n){
+    const v = Number(n)||0;
+    return new Intl.NumberFormat('es-PY', { style:'currency', currency:'PYG', maximumFractionDigits:0 }).format(v);
+  }
+
+  function pintarTabla(servicios){
+    const tbody = document.getElementById('servicesBody');
+    if(!servicios.length){
+      tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">No hay servicios para la fecha</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = servicios.map(s=>{
+      const d = new Date(s.fecha);
+      const hh = String(d.getHours()).padStart(2,'0');
+      const mm = String(d.getMinutes()).padStart(2,'0');
+      const mascota = s.mascota?.nombre || `ID ${s.mascotaId}`;
+      const tipo = s.tipoServicio?.nombre || s.tipo || '—';
+      const empleado = s.empleado?.username || (s.empleadoId ? `ID ${s.empleadoId}` : '—');
+      const precio = precioTipo(s);
+      return `
+        <tr>
+          <td>${s.id}</td>
+          <td>${hh}:${mm}</td>
+          <td>${mascota}</td>
+          <td>${tipo}</td>
+          <td><span class="badge ${badgeEstado(s.estado)}">${s.estado}</span></td>
+          <td>${formatearGs(precio)}</td>
+          <td>${empleado}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function badgeEstado(estado){
+    switch(estado){
+      case 'pendiente': return 'bg-secondary';
+      case 'en_proceso': return 'bg-info';
+      case 'completado': return 'bg-success';
+      case 'cancelado': return 'bg-danger';
+      default: return 'bg-dark';
+    }
+  }
+
+  function pintarGraficas(porTipo){
+    const labels = Object.keys(porTipo);
+    const ingresos = labels.map(k => porTipo[k].ingresos);
+    const cantidades = labels.map(k => porTipo[k].cantidad);
+
+    // Destruir si ya existen
+    if(chartIngresos){ chartIngresos.destroy(); }
+    if(chartCantidad){ chartCantidad.destroy(); }
+
+    const ctx1 = document.getElementById('chartIngresos');
+    const ctx2 = document.getElementById('chartCantidad');
+
+    chartIngresos = new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Ingresos (PYG)',
+          data: ingresos
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: true } },
+        scales: {
+          y: { beginAtZero: true, ticks: { callback: v => formatearGs(v).replace(' ',' ') } }
+        }
+      }
+    });
+
+    chartCantidad = new Chart(ctx2, {
+      type: 'doughnut',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Cantidad',
+          data: cantidades
+        }]
+      },
+      options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    });
+  }
+</script>
 </body>
 </html>

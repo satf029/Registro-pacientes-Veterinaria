@@ -9,6 +9,7 @@ import weatherRoutes from "./routes/weather.routes";
 import cors from "cors";
 import path from 'path';
 import serviceRoute from "./routes/servicio.route";
+import pacienteRoute from "./routes/paciente.routes"
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use(logger);
 app.use('/api', loginRoute);
 app.use('/api', propietarioRoutes);
+app.use('/api',pacienteRoute)
 app.use('/api',userRoute);
 app.use('/api',medicamentoRoute);
 app.use('/api', weatherRoutes);

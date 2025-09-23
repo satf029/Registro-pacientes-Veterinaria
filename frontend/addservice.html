@@ -215,8 +215,8 @@
 
       const payload = {
         mascotaId: Number(mascotaIdEl.value),
-        tipoServicio: tipoEl.value.trim(),      // 👈 texto
-        empleadoId: Number(empleadoId),         // 👈 localStorage
+        tipoServicio: tipoEl.value.trim(),      
+        empleadoId: Number(empleadoId),         
         fecha: fechaVal ? new Date(fechaVal).toISOString() : undefined,
         estado: estadoVal,
         precio: precioEl.value ? Number(precioEl.value) : null,

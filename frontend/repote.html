@@ -176,7 +176,6 @@
       // Cargar clima
       const clima = await fetchClima(city, date);
 
-      // Cargar servicios (array). Si tu backend acepta filtros por fecha, usa la versión con query params comentada abajo.
       const servicios = await fetchServicios(token);
       const delDia = filtrarServiciosPorFecha(servicios, date);
 
@@ -230,13 +229,8 @@
   }
 
   async function fetchServicios(token){
-    // Si tu backend acepta filtros: usa esto (y comenta las 2 líneas de abajo):
-    // const desde = new Date(document.getElementById('date').value + 'T00:00:00');
-    // const hasta = new Date(document.getElementById('date').value + 'T23:59:59');
-    // const qs = new URLSearchParams({ desde: desde.toISOString(), hasta: hasta.toISOString() });
-    // const url = `${API}/api/servicios?${qs.toString()}`;
 
-    const url = `${API}/api/servicios`; // ← sin filtros; filtramos en el front por fecha
+    const url = `${API}/api/servicios`; // filtramos en el front por fecha
     const r = await fetch(url, {
       headers: { Authorization: `Bearer ${token}` }
     });
@@ -265,7 +259,7 @@
   }
 
   function precioTipo(s){
-    // usar precio del tipo de servicio si viene incluido; si no, cae a s.precio
+    // usa precio del tipo de servicio si viene incluido; si no, cae a s.precio
     if (s?.tipoServicio?.precio != null) return Number(s.tipoServicio.precio) || 0;
     return Number(s.precio) || 0;
   }
@@ -275,12 +269,11 @@
     const atendidos = servicios.filter(s => s.estado !== 'cancelado');
     const countAtendidos = atendidos.length;
 
-    // ingresos: solo completados (puedes cambiarlo a != cancelado si preferís)
     const completados = servicios.filter(s => s.estado === 'completado');
     const importes = completados.map(precioTipo);
     const totalIngresos = importes.reduce((a,b)=> a + (Number(b)||0), 0);
 
-    // ticket máximo del día (entre completados; si querés entre todos, cambia 'completados' por 'servicios')
+    // ticket máximo del día 
     const maxTicket = importes.length ? Math.max(...importes) : 0;
 
     // agregación por tipo para gráficas (usa nombre del tipo si está incluido)

@@ -144,7 +144,6 @@
       token = jwt;
 
       try {
-        // Ideal: el backend incluye dueno->persona
         const res = await fetch(`http://localhost:3000/api/mascotas`, {
           headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }
         });
@@ -152,7 +151,6 @@
         if (!res.ok) throw new Error(await res.text() || "Error al listar mascotas");
 
         const data = await res.json();
-        // Soporta {items: [...], total} o lista directa
         pacientesCache = Array.isArray(data) ? data : (data.items || []);
         totalPacientes = Array.isArray(data) ? data.length : (data.total ?? pacientesCache.length);
 

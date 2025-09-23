@@ -201,14 +201,11 @@
       if(show){ sp.classList.remove('d-none'); btn.disabled=true; } else { sp.classList.add('d-none'); btn.disabled=false; }
     }
 
-    // ---- API helpers (ajusta si tu contrato difiere) ----
     async function apiBuscarPropietarioPorDocumento(documento, token) {
       // normalizo por si viene con puntos/guiones
       const doc = String(documento).replace(/[.\-]/g, '').trim();
       if (!doc) return null;
 
-      // OJO: si montaste el router con app.use('/api', router),
-      // la URL del front debe incluir /api:
       const url = `${API}/api/propietarios/${encodeURIComponent(doc)}`;
 
       const r = await fetch(url, {
@@ -220,14 +217,7 @@
 
       const data = await r.json();
 
-      // Si tu endpoint responde { id, persona, ... }:
       return data ?? null;
-
-      // Si respondiera { propietario: { ... } }, usa:
-      // return data?.propietario ?? null;
-
-      // Si respondiera { items: [...] }, usa:
-      // return Array.isArray(data.items) ? data.items[0] ?? null : null;
     }
 
 

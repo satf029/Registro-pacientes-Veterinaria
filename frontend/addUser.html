@@ -109,8 +109,6 @@
                     method: "POST",
                     headers: { 
                         "Content-Type": "application/json",
-                        // Si necesitas autenticación, descomenta la siguiente línea
-                        // "Authorization": `Bearer ${localStorage.getItem("token")}`
                     },
                     body: JSON.stringify(userData)
                 });
@@ -124,10 +122,6 @@
                     // Limpiar formulario después de crear usuario
                     limpiarFormulario();
                     
-                    // Opcional: redirigir después de unos segundos
-                    // setTimeout(() => {
-                    //     window.location.href = "usuarios.html";
-                    // }, 2000);
                     
                 } else {
                     const errorText = await res.text();

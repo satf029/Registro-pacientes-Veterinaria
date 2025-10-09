@@ -207,23 +207,8 @@ export const adjustStock = async (req: Request, res: Response, next: NextFunctio
     const { id } = req.params;
     try {
         const { 
-            tipo, // 'ENTRADA' o 'SALIDA'
             cantidad,
-            motivo
         } = req.body;
-
-        // Validaciones
-        if (!tipo || !cantidad) {
-            return res.status(400).json({ 
-                message: 'Tipo y cantidad son requeridos' 
-            });
-        }
-
-        if (!['ENTRADA', 'SALIDA'].includes(tipo)) {
-            return res.status(400).json({ 
-                message: 'Tipo debe ser ENTRADA o SALIDA' 
-            });
-        }
 
         if (cantidad <= 0) {
             return res.status(400).json({ 
@@ -243,7 +228,7 @@ export const adjustStock = async (req: Request, res: Response, next: NextFunctio
         }
 
         // Calcular nuevo stock
-        const cantidadMovimiento = tipo === 'ENTRADA' ? Number(cantidad) : -Number(cantidad);
+        const cantidadMovimiento = Number(cantidad);
         const nuevoStock = medicamento.stock + cantidadMovimiento;
 
         // Validar que el stock no sea negativo
@@ -263,11 +248,10 @@ export const adjustStock = async (req: Request, res: Response, next: NextFunctio
         });
 
         res.json({
-            message: `Stock ajustado correctamente. ${tipo}: ${cantidad} unidades`,
+            message: `Stock ajustado correctamente.${cantidad} unidades`,
             medicamento: medicamentoActualizado,
             stockAnterior: medicamento.stock,
             stockNuevo: nuevoStock,
-            motivo: motivo || `${tipo} de stock`
         });
     } catch (error) {
         next(error);

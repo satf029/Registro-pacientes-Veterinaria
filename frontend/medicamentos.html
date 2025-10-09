@@ -1,395 +1,239 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
-    <title>Productos Veterinaria</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+  <title>Medicamentos Veterinaria</title>
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="collapse navbar-collapse" id="navbarNavDropdown">
-            <ul class="navbar-nav mx-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Servicios</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="javascript:window.location.href='usuarios.html'">Usuarios</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="javascript:window.location.href='mascotas.html'">Pacientes</a>
-                </li>
-                <li class="nav-item active">
-                    <a class="nav-link" href="#">Medicamentos</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Roles</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-    
-    <div class="container mt-4">
-        <!-- Lista de productos -->
-        <div class="card shadow">
-            <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                <h3 class="card-title mb-0">💊 Lista de Productos Veterinarios</h3>
-                <div>
-                    <button type="button" class="btn btn-primary" onclick="createProduct()">
-                        ➕ Agregar Producto
-                    </button>
-                </div>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover mb-0" id="products-table">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>ID</th>
-                                <th>Producto</th>
-                                <th>Categoría</th>
-                                <th>Presentación</th>
-                                <th>Precio</th>
-                                <th>Stock</th>
-                                <th>Prescripción</th>
-                                <th>Vencimiento</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="products-tbody">
-                            <tr>
-                                <td colspan="9" class="text-center py-4 text-muted">
-                                    ⏳ Cargando productos...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="card-footer">
-                <div class="d-flex justify-content-between align-items-center">
-                    <small class="text-muted" id="totalProductos">Total: 0 productos</small>
-                    <div>
-                        <span class="badge bg-success me-2">● Disponible</span>
-                        <span class="badge bg-warning me-2">● Stock Bajo</span>
-                        <span class="badge bg-danger">● Agotado</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+<body class="bg-light">
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold text-primary" href="services.html">🐾 Veterinaria</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item"><a class="nav-link" href="services.html">Servicios</a></li>
+          <li class="nav-item"><a class="nav-link" href="usuarios.html">Usuarios</a></li>
+          <li class="nav-item"><a class="nav-link" href="mascotas.html">Pacientes</a></li>
+          <li class="nav-item"><a class="nav-link active fw-bold" href="medicamentos.html">Medicamentos</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Roles</a></li>
+          <li class="nav-item"><a class="nav-link" href="reporte.html">Reportes</a></li>
+        </ul>
+      </div>
     </div>
+  </nav>
 
-    <!-- Modal de alerta -->
-    <div class="alert alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3" 
-         role="alert" id="alertModal" style="display: none; z-index: 1050;">
-        <span id="alertMessage"></span>
-        <button type="button" class="btn-close" onclick="hideAlert()"></button>
+  <!-- Contenido principal -->
+  <div class="container mt-4">
+    <div class="card shadow">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h3 class="card-title mb-0">💊 Lista de Medicamentos</h3>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-success" onclick="exportarInventario()">⬇️ Exportar Inventario</button>
+          <button type="button" class="btn btn-primary" onclick="createProduct()">➕ Agregar Producto</button>
+        </div>
+      </div>
+
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-striped table-hover mb-0" id="products-table">
+            <thead class="table-dark">
+              <tr>
+                <th>ID</th>
+                <th>Producto</th>
+                <th>Categoría</th>
+                <th>Presentación</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Prescripción</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="products-tbody">
+              <tr>
+                <td colspan="8" class="text-center py-4 text-muted">⏳ Cargando productos...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <div class="d-flex justify-content-between align-items-center">
+          <small class="text-muted" id="totalProductos">Total: 0 medicamentos</small>
+          <div>
+            <span class="badge bg-success me-2">● Disponible</span>
+            <span class="badge bg-warning me-2">● Stock Bajo</span>
+            <span class="badge bg-danger">● Agotado</span>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <script>
-        let token = "";
-        let todosLosProductos = []; // Array para almacenar todos los productos
+  <!-- Alerta flotante -->
+  <div class="alert alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3 shadow"
+       role="alert" id="alertModal" style="display: none; z-index:2000;">
+    <span id="alertMessage"></span>
+    <button type="button" class="btn-close" onclick="hideAlert()"></button>
+  </div>
 
-        async function createProduct() {
-            window.location.href = "addMedicamento.html";
+  <script>
+    let todosLosProductos = [];
+
+    function createProduct(){ window.location.href = "addMedicamento.html"; }
+
+    async function loadProducts() {
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("userId");
+
+      if (!token || !userId) {
+        showAlert("No hay sesión activa. Redirigiendo al login...", "warning");
+        return setTimeout(()=> window.location.href="login.html",2000);
+      }
+
+      try {
+        const res = await fetch("http://localhost:3000/api/medicamentos", {
+          headers: { Authorization: `Bearer ${token}`, "Content-Type":"application/json" }
+        });
+
+        if(res.ok){
+          const data = await res.json();
+          todosLosProductos = data;
+          renderProducts(data);
+        } else if(res.status === 401){
+          showAlert("Sesión expirada. Redirigiendo al login...", "warning");
+          localStorage.clear();
+          setTimeout(()=> window.location.href="login.html",2000);
+        } else {
+          const txt = await res.text();
+          showAlert(`Error al cargar medicamentos: ${txt}`,"danger");
         }
+      } catch(err){
+        showAlert(`Error de conexión: ${err.message}`,"danger");
+      }
+    }
 
-        async function loadProducts() {
-            const token = localStorage.getItem("token");
-            const userId = localStorage.getItem("userId");
-            
-            if (!token || !userId) {
-                showAlert("No hay sesión activa. Redirigiendo al login...", "warning");
-                setTimeout(() => {
-                    window.location.href = "login.html";
-                }, 2000);
-                return;
-            }
+    function renderProducts(products){
+      const tbody = document.getElementById("products-tbody");
+      const totalEl = document.getElementById("totalProductos");
 
-            try {
-                const res = await fetch(`http://localhost:3000/api/medicamentos`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json"
-                    }
-                });
-                
-                if (res.ok) {
-                    const medicamentos = await res.json();
-                    todosLosProductos = medicamentos;
-                    renderProducts(medicamentos);
-                } else if (res.status === 401) {
-                    showAlert("Sesión expirada. Redirigiendo al login...", "warning");
-                    localStorage.removeItem("token");
-                    localStorage.removeItem("userId");
-                    setTimeout(() => {
-                        window.location.href = "login.html";
-                    }, 2000);
-                } else {
-                    const errorText = await res.text();
-                    showAlert(`Error al cargar medicamentos: ${errorText}`, "danger");
-                    document.getElementById("products-tbody").innerHTML = `
-                        <tr>
-                            <td colspan="9" class="text-center py-4 text-danger">
-                                ❌ Error al cargar medicamentos
-                            </td>
-                        </tr>
-                    `;
-                }
+      if(!products || products.length===0){
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted">🔍 No hay medicamentos registrados</td></tr>`;
+        totalEl.textContent = "Total: 0 medicamentos";
+        return;
+      }
 
-            } catch (error) {
-                showAlert(`Error de conexión: ${error.message}`, "danger");
-                document.getElementById("products-tbody").innerHTML = `
-                    <tr>
-                        <td colspan="9" class="text-center py-4 text-danger">
-                            ❌ Error de conexión
-                        </td>
-                    </tr>
-                `;
-            }
+      tbody.innerHTML = products.map(p=>{
+        const categoria = getPrincipioActivoLabel(p.principioActivo);
+        const estadoStock = getEstadoStock(p.stock,10);
+        const precio = p.precio ? p.precio.toFixed(2) : "—";
+        const prescripcion = p.requierePrescripcion
+          ? '<span class="badge bg-warning">Requiere receta</span>'
+          : '<span class="badge bg-info">Sin receta</span>';
+
+        return `
+          <tr>
+            <td>${p.id}</td>
+            <td><strong>${p.nombre}</strong>${p.dosis? `<br><small class="text-muted">Dosis: ${p.dosis}</small>`:''}</td>
+            <td><span class="badge bg-secondary">${categoria}</span><br><small>${p.laboratorio || "—"}</small></td>
+            <td>${p.presentacion || "—"}</td>
+            <td>${precio}</td>
+            <td><span class="badge ${estadoStock.class}">${p.stock} unid.</span><br>${estadoStock.badge}</td>
+            <td>${prescripcion}</td>
+            <td>
+              <div class="btn-group btn-group-sm">
+                <button class="btn btn-warning" onclick="editProduct(${p.id})" title="Editar">✏️</button>
+                <button class="btn btn-success" onclick="adjustStock(${p.id})" title="Ajustar stock">📦</button>
+                <button class="btn btn-danger" onclick="deleteProduct(${p.id},'${p.nombre}')" title="Eliminar">🗑️</button>
+              </div>
+            </td>
+          </tr>`;
+      }).join("");
+
+      totalEl.textContent = `Total: ${products.length} medicamentos`;
+    }
+
+    function getPrincipioActivoLabel(p){ return p ? (p.length>15? p.substring(0,15)+"...":p) : "—"; }
+    function getEstadoStock(stock,min=10){
+      if(stock===0) return {class:"bg-danger",badge:"<span class='badge bg-danger'>Agotado</span>"};
+      if(stock<=min) return {class:"bg-warning",badge:"<span class='badge bg-warning'>Stock Bajo</span>"};
+      return {class:"bg-success",badge:"<span class='badge bg-success'>Disponible</span>"};
+    }
+
+    async function editProduct(id){ window.location.href=`editMedicamento.html?id=${id}`; }
+
+    async function adjustStock(id){
+      const cantidad = prompt("Ingrese la cantidad (use - para salidas):");
+      if(!cantidad) return;
+      const n = parseInt(cantidad);
+      if(isNaN(n)) return showAlert("Cantidad inválida","danger");
+      const tipo = n>0? "ENTRADA":"SALIDA";
+      const motivo = prompt(`Motivo del ajuste de stock (${tipo}):`);
+      if(motivo===null) return;
+
+      const token = localStorage.getItem("token");
+      try{
+        const res = await fetch(`http://localhost:3000/api/medicamentos/${id}/stock`,{
+          method:"PATCH",
+          headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},
+          body:JSON.stringify({tipo,cantidad:Math.abs(n),motivo})
+        });
+        if(res.ok){
+          showAlert("Stock actualizado ✅","success");
+          loadProducts();
+        } else {
+          const txt = await res.text();
+          showAlert(`Error: ${txt}`,"danger");
         }
+      }catch(err){ showAlert(`Error conexión: ${err.message}`,"danger"); }
+    }
 
-        function renderProducts(products) {
-            const tbody = document.getElementById("products-tbody");
-            const totalElement = document.getElementById("totalProductos");
-            
-            if (!products || products.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="9" class="text-center py-4 text-muted">
-                            🔍 No hay medicamentos registrados
-                        </td>
-                    </tr>
-                `;
-                totalElement.textContent = "Total: 0 medicamentos";
-                return;
-            }
-            
-            tbody.innerHTML = products.map(product => {
-                // Adaptar a la estructura del modelo de medicamento
-                const categoria = getPrincipioActivoLabel(product.principioActivo);
-                const estadoStock = getEstadoStock(product.stock, 10); // Stock mínimo por defecto
-                const precio = product.precio ? `${product.precio.toFixed(2)}` : 'Sin precio';
-                const presentacion = product.presentacion || 'Sin especificar';
-                const laboratorio = product.laboratorio || 'Sin laboratorio';
-                const prescripcion = product.requierePrescripcion ? 
-                    '<span class="badge bg-warning">Requiere receta</span>' : 
-                    '<span class="badge bg-info">Sin receta</span>';
-                
-                return `
-                    <tr>
-                        <td>${product.id}</td>
-                        <td>
-                            <strong>${product.nombre}</strong>
-                            ${product.dosis ? `<br><small class="text-muted">Dosis: ${product.dosis}</small>` : ''}
-                        </td>
-                        <td>
-                            <span class="badge bg-secondary">${categoria}</span>
-                            <br><small>${laboratorio}</small>
-                        </td>
-                        <td>${presentacion}</td>
-                        <td>${precio}</td>
-                        <td>
-                            <span class="badge ${estadoStock.class}">${product.stock} unidades</span>
-                        </td>
-                        <td>${estadoStock.badge}</td>
-                        <td>
-                            ${prescripcion}
-                        </td>
-                        <td>
-                            <div class="btn-group" role="group">
-                                <button class="btn btn-warning btn-sm" onclick="editProduct(${product.id})" title="Editar">
-                                    ✏️
-                                </button>
-                                <button class="btn btn-success btn-sm" onclick="adjustStock(${product.id})" title="Ajustar stock">
-                                    📦
-                                </button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id}, '${product.nombre}')" title="Eliminar">
-                                    🗑️
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-            
-            totalElement.textContent = `Total: ${products.length} medicamentos`;
+    async function deleteProduct(id,nombre){
+      if(!confirm(`¿Eliminar el medicamento "${nombre}"?`)) return;
+      const token = localStorage.getItem("token");
+      try{
+        const res = await fetch(`http://localhost:3000/api/medicamentos/${id}`,{
+          method:"DELETE",
+          headers:{Authorization:`Bearer ${token}`}
+        });
+        if(res.ok){
+          showAlert(`"${nombre}" eliminado correctamente ✅`,"success");
+          loadProducts();
+        } else {
+          const txt = await res.text();
+          showAlert(`Error al eliminar: ${txt}`,"danger");
         }
+      }catch(err){ showAlert(`Error conexión: ${err.message}`,"danger"); }
+    }
 
-        function getPrincipioActivoLabel(principioActivo) {
-            if (!principioActivo) return 'Sin especificar';
-            // Retornar el principio activo o una etiqueta más corta
-            return principioActivo.length > 15 ? 
-                principioActivo.substring(0, 15) + '...' : 
-                principioActivo;
-        }
+    function exportarInventario(){
+      let csv="ID,Nombre,Principio Activo,Laboratorio,Dosis,Presentacion,Stock,Precio,Prescripcion\n";
+      todosLosProductos.forEach(p=>{
+        csv+=`${p.id},"${p.nombre}","${p.principioActivo||""}","${p.laboratorio||""}","${p.dosis||""}","${p.presentacion||""}",${p.stock},${p.precio||0},${p.requierePrescripcion}\n`;
+      });
+      const blob=new Blob([csv],{type:"text/csv"});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement("a");
+      a.href=url;a.download=`inventario_${new Date().toISOString().split("T")[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
 
-        function getEstadoStock(stock, stockMinimo = 10) {
-            if (stock === 0) {
-                return {
-                    class: 'bg-danger',
-                    badge: '<span class="badge bg-danger">Agotado</span>'
-                };
-            } else if (stock <= stockMinimo) {
-                return {
-                    class: 'bg-warning',
-                    badge: '<span class="badge bg-warning">Stock Bajo</span>'
-                };
-            } else {
-                return {
-                    class: 'bg-success',
-                    badge: '<span class="badge bg-success">Disponible</span>'
-                };
-            }
-        }
+    function showAlert(msg,type){
+      const m=document.getElementById("alertModal"),t=document.getElementById("alertMessage");
+      m.className=`alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3 shadow`;
+      t.textContent=msg;m.style.display="block";setTimeout(hideAlert,4000);
+    }
+    function hideAlert(){ document.getElementById("alertModal").style.display="none"; }
 
-        function filtrarProductos() {
-            const nombre = document.getElementById('filtroNombre').value.toLowerCase();
-            const principio = document.getElementById('filtroPrincipio').value.toLowerCase();
-            const laboratorio = document.getElementById('filtroLaboratorio').value.toLowerCase();
-            const stockFilter = document.getElementById('filtroStock').value;
-            const prescripcion = document.getElementById('filtroPrescripcion').value;
-
-            let productosFiltrados = todosLosProductos.filter(product => {
-                const matchNombre = !nombre || product.nombre.toLowerCase().includes(nombre);
-                const matchPrincipio = !principio || (product.principioActivo && product.principioActivo.toLowerCase().includes(principio));
-                const matchLaboratorio = !laboratorio || (product.laboratorio && product.laboratorio.toLowerCase().includes(laboratorio));
-                const matchPrescripcion = !prescripcion || product.requierePrescripcion.toString() === prescripcion;
-                
-                let matchStock = true;
-                if (stockFilter === 'disponible') {
-                    matchStock = product.stock > 10; // Stock mínimo por defecto
-                } else if (stockFilter === 'bajo') {
-                    matchStock = product.stock > 0 && product.stock <= 10;
-                } else if (stockFilter === 'agotado') {
-                    matchStock = product.stock === 0;
-                }
-                
-                return matchNombre && matchPrincipio && matchLaboratorio && matchStock && matchPrescripcion;
-            });
-
-            renderProducts(productosFiltrados);
-        }
-
-        async function editProduct(id) {
-            window.location.href = `editMedicamento.html?id=${id}`;
-        }
-
-        async function adjustStock(id) {
-            const cantidad = prompt("Ingrese la cantidad (use - para salidas):");
-            if (cantidad === null || cantidad === "") return;
-            
-            const cantidadNum = parseInt(cantidad);
-            if (isNaN(cantidadNum)) {
-                showAlert("Cantidad inválida", "danger");
-                return;
-            }
-
-            const tipo = cantidadNum > 0 ? 'ENTRADA' : 'SALIDA';
-            const cantidadAbs = Math.abs(cantidadNum);
-            const motivo = prompt(`Motivo del ajuste de stock (${tipo}):`);
-            
-            if (motivo === null) return;
-
-            const token = localStorage.getItem("token");
-            
-            try {
-                const res = await fetch(`http://localhost:3000/api/medicamentos/${id}/stock`, {
-                    method: 'PATCH',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        tipo: tipo,
-                        cantidad: cantidadAbs,
-                        motivo: motivo
-                    })
-                });
-
-                if (res.ok) {
-                    const result = await res.json();
-                    showAlert(result.message, "success");
-                    loadProducts(); // Recargar la lista
-                } else {
-                    const errorText = await res.text();
-                    showAlert(`Error: ${errorText}`, "danger");
-                }
-            } catch (error) {
-                showAlert(`Error de conexión: ${error.message}`, "danger");
-            }
-        }
-
-        async function deleteProduct(id, nombre) {
-            if (!confirm(`¿Está seguro de que desea eliminar el medicamento "${nombre}"?`)) {
-                return;
-            }
-
-            const token = localStorage.getItem("token");
-            
-            try {
-                const res = await fetch(`http://localhost:3000/api/medicamentos/${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json"
-                    }
-                });
-
-                if (res.ok) {
-                    showAlert(`Medicamento "${nombre}" eliminado correctamente`, "success");
-                    loadProducts(); // Recargar la lista
-                } else {
-                    const errorText = await res.text();
-                    showAlert(`Error al eliminar: ${errorText}`, "danger");
-                }
-            } catch (error) {
-                showAlert(`Error de conexión: ${error.message}`, "danger");
-            }
-        }
-
-        function exportarInventario() {
-            const token = localStorage.getItem("token");
-            
-            // Generar CSV simple
-            let csvContent = "ID,Nombre,Principio Activo,Laboratorio,Dosis,Presentacion,Stock,Precio,Requiere Prescripcion\n";
-            
-            todosLosProductos.forEach(product => {
-                csvContent += `${product.id},"${product.nombre}","${product.principioActivo || ''}","${product.laboratorio || ''}","${product.dosis || ''}","${product.presentacion || ''}",${product.stock},${product.precio || 0},${product.requierePrescripcion}\n`;
-            });
-            
-            // Descargar archivo
-            const blob = new Blob([csvContent], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = `inventario_medicamentos_${new Date().toISOString().split('T')[0]}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            
-            showAlert("Inventario exportado correctamente", "success");
-        }
-
-        function showAlert(message, type) {
-            const alertModal = document.getElementById('alertModal');
-            const alertMessage = document.getElementById('alertMessage');
-            
-            alertModal.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
-            alertMessage.textContent = message;
-            alertModal.style.display = 'block';
-            
-            setTimeout(hideAlert, 4000);
-        }
-
-        function hideAlert() {
-            const alertModal = document.getElementById('alertModal');
-            alertModal.style.display = 'none';
-        }
-
-        // Cargar productos al abrir la página
-        window.onload = loadProducts;
-    </script>
+    window.onload=loadProducts;
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

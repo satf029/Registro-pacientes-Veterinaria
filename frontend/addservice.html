@@ -2,21 +2,28 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"/>
   <title>Agregar Servicio</title>
 </head>
-<body>
+<body class="bg-light">
   <!-- NAVBAR -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="collapse navbar-collapse" id="navbarNavDropdown">
-      <ul class="navbar-nav mx-auto">
-        <li class="nav-item active"><a class="nav-link" href="services.html">Servicios</a></li>
-        <li class="nav-item"><a class="nav-link" href="usuarios.html">Usuarios</a></li>
-        <li class="nav-item"><a class="nav-link" href="mascotas.html">Pacientes</a></li>
-        <li class="nav-item"><a class="nav-link" href="medicamentos.html">Medicamentos</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Roles</a></li>
-      </ul>
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold text-primary" href="services.html">🐾 Veterinaria</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item"><a class="nav-link active fw-bold" href="services.html">Servicios</a></li>
+          <li class="nav-item"><a class="nav-link" href="usuarios.html">Usuarios</a></li>
+          <li class="nav-item"><a class="nav-link" href="mascotas.html">Pacientes</a></li>
+          <li class="nav-item"><a class="nav-link" href="medicamentos.html">Medicamentos</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Roles</a></li>
+          <li class="nav-item"><a class="nav-link" href="reporte.html">Reportes</a></li>
+        </ul>
+      </div>
     </div>
   </nav>
 
@@ -40,10 +47,9 @@
                 <!-- Mascota -->
                 <div class="col-md-6">
                   <label class="form-label">Mascota <span class="text-danger">*</span></label>
-                  <div id="mascotaSelectWrap">
-                    <select id="mascotaId" class="form-select" required></select>
-                  </div>
-                  <small class="text-muted" id="mascotaHelp"></small>
+                  <select id="mascotaId" class="form-select" required>
+                    <option value="">Cargando mascotas...</option>
+                  </select>
                   <div class="invalid-feedback">Seleccione la mascota.</div>
                 </div>
 
@@ -98,9 +104,7 @@
                           <th style="width: 20%">Acciones</th>
                         </tr>
                       </thead>
-                      <tbody id="detalleBody">
-                        <!-- filas dinámicas -->
-                      </tbody>
+                      <tbody id="detalleBody"></tbody>
                     </table>
                   </div>
                   <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarFilaDetalle()">➕ Agregar línea</button>
@@ -124,8 +128,8 @@
   </div>
 
   <!-- Alertita -->
-  <div class="alert alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3"
-       role="alert" id="alertModal" style="display:none; z-index:1050;">
+  <div class="alert alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3 shadow"
+       role="alert" id="alertModal" style="display:none; z-index:2000;">
     <span id="alertMessage"></span>
     <button type="button" class="btn-close" onclick="hideAlert()"></button>
   </div>
@@ -137,7 +141,7 @@
     function volverAtras(){ window.location.href = 'services.html'; }
     function showAlert(message, type){
       const m=document.getElementById('alertModal'), t=document.getElementById('alertMessage');
-      m.className=`alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+      m.className=`alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3 shadow`;
       t.textContent=message; m.style.display='block'; setTimeout(hideAlert, 4000);
     }
     function hideAlert(){ document.getElementById('alertModal').style.display='none'; }
@@ -168,6 +172,7 @@
         selectEl.innerHTML = `<option value="">${placeholder}</option>` + list.map(mapFn).join('');
         return true;
       }catch(_){
+        selectEl.innerHTML = `<option value="">No se pudo cargar</option>`;
         return false;
       }
     }
@@ -176,7 +181,7 @@
     document.getElementById('servicioForm').addEventListener('submit', async (e)=>{
       e.preventDefault();
       const token = localStorage.getItem('token');
-      const empleadoId = localStorage.getItem('userId'); // 👈 empleado = usuario logueado
+      const empleadoId = localStorage.getItem('userId');
       if(!token || !empleadoId){
         showAlert('No hay sesión activa. Redirigiendo al login...', 'warning');
         return setTimeout(()=>window.location.href='login.html',1500);
@@ -185,53 +190,39 @@
       // validaciones
       const mascotaIdEl = document.getElementById('mascotaId');
       const tipoEl = document.getElementById('tipoServicio');
+      const precioEl = document.getElementById('precio');
+
+      mascotaIdEl.classList.remove('is-invalid');
+      tipoEl.classList.remove('is-invalid');
+      precioEl.classList.remove('is-invalid');
+
       if(!mascotaIdEl.value){ mascotaIdEl.classList.add('is-invalid'); return; }
       if(!tipoEl.value.trim()){ tipoEl.classList.add('is-invalid'); return; }
-
-      const fechaVal = document.getElementById('fecha').value;
-      const estadoVal = document.getElementById('estado').value || 'pendiente';
-      if(!ESTADOS.includes(estadoVal)){ showAlert('Estado inválido', 'danger'); return; }
-
-      const precioEl = document.getElementById('precio');
-      if(precioEl.value && Number(precioEl.value) < 0){
-        precioEl.classList.add('is-invalid'); return;
-      }
-
-      // detalle
-      const detalle = [];
-      document.querySelectorAll('#detalleBody tr').forEach(tr=>{
-        const [medIdEl, cantEl, dosisEl] = tr.querySelectorAll('input');
-        const mid = medIdEl.value.trim();
-        const cant = cantEl.value.trim();
-        const dos = dosisEl.value.trim();
-        if(mid !== ''){
-          detalle.push({
-            medicamentoId: Number(mid),
-            cantidad: cant === '' ? null : Number(cant),
-            dosis: dos || null
-          });
-        }
-      });
+      if(precioEl.value && Number(precioEl.value) < 0){ precioEl.classList.add('is-invalid'); return; }
 
       const payload = {
         mascotaId: Number(mascotaIdEl.value),
-        tipoServicio: tipoEl.value.trim(),      
-        empleadoId: Number(empleadoId),         
-        fecha: fechaVal ? new Date(fechaVal).toISOString() : undefined,
-        estado: estadoVal,
+        tipoServicio: tipoEl.value.trim(),
+        empleadoId: Number(empleadoId),
+        fecha: document.getElementById('fecha').value ? new Date(document.getElementById('fecha').value).toISOString() : undefined,
+        estado: document.getElementById('estado').value || 'pendiente',
         precio: precioEl.value ? Number(precioEl.value) : null,
         observaciones: document.getElementById('observaciones').value || null,
-        detalleServicios: detalle.length ? detalle : undefined
+        detalleServicios: Array.from(document.querySelectorAll('#detalleBody tr')).map(tr=>{
+          const [medIdEl, cantEl, dosisEl] = tr.querySelectorAll('input');
+          return {
+            medicamentoId: medIdEl.value ? Number(medIdEl.value) : null,
+            cantidad: cantEl.value ? Number(cantEl.value) : null,
+            dosis: dosisEl.value || null
+          };
+        }).filter(d=>d.medicamentoId)
       };
 
       try{
         toggleLoading(true);
         const res = await fetch(`${API}/api/servicios`, {
           method: 'POST',
-          headers: {
-            'Content-Type':'application/json',
-            'Authorization': `Bearer ${token}`
-          },
+          headers: { 'Content-Type':'application/json','Authorization': `Bearer ${token}` },
           body: JSON.stringify(payload)
         });
 

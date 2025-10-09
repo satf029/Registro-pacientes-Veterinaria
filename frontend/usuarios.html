@@ -1,180 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
-    <title>usuarios</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+  <title>Usuarios</title>
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="collapse navbar-collapse" id="navbarNavDropdown">
-            <ul class="navbar-nav mx-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="javascript:window.location.href='services.html'">Servicios</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href = "javascript:window.location.href='usuarios.html'">Usuarios</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="javascript:window.location.href='mascotas.html'">Pacientes</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="javascript:window.location.href='medicamentos.html'">Medicamentos</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Roles</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="javascript:window.location.href='repote.html'">Reportes</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-    <div class="container mt-4">
-        <!-- Lista de usuarios -->
-        <div class="card shadow">
-            <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                <h3 class="card-title mb-0">👥 Lista de Usuarios</h3>
-                <button type="button" class="btn btn-primary" onclick="createUser()">
-                    ➕ 
-                </button>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover mb-0" id="users-table">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Email</th>
-                                <th>Telefono</th>
-                                <th>Documento</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="users-tbody">
-                            <tr>
-                                <td colspan="7" class="text-center py-4 text-muted">
-                                    ⏳ Cargando usuarios...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+<body class="bg-light">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold text-primary" href="usuarios.html">🐾 Veterinaria</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item"><a class="nav-link" href="services.html">Servicios</a></li>
+          <li class="nav-item"><a class="nav-link active fw-bold" href="usuarios.html">Usuarios</a></li>
+          <li class="nav-item"><a class="nav-link" href="mascotas.html">Pacientes</a></li>
+          <li class="nav-item"><a class="nav-link" href="medicamentos.html">Medicamentos</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Roles</a></li>
+          <li class="nav-item"><a class="nav-link" href="reporte.html">Reportes</a></li>
+        </ul>
+      </div>
     </div>
-    <script>
-        let token = "";
-        
-        async function createUser() {
-            window.location.href ="addUser.html"
+  </nav>
+
+  <!-- Contenedor principal -->
+  <div class="container mt-4">
+    <!-- Alertas -->
+    <div id="alert-container"></div>
+
+    <!-- Lista de usuarios -->
+    <div class="card shadow">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h3 class="card-title mb-0">👥 Lista de Usuarios</h3>
+        <button type="button" class="btn btn-primary" onclick="createUser()">➕ Nuevo</button>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-striped table-hover mb-0" id="users-table">
+            <thead class="table-dark">
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Teléfono</th>
+                <th>Documento</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="users-tbody">
+              <tr>
+                <td colspan="7" class="text-center py-4 text-muted">
+                  ⏳ Cargando usuarios...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function createUser() {
+      window.location.href = "addUser.html";
+    }
+
+    async function loadUsers() {
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("userId");
+
+      if (!token || !userId) {
+        showAlert("No hay sesión activa. Redirigiendo al login...", "warning");
+        setTimeout(() => window.location.href = "login.html", 2000);
+        return;
+      }
+
+      try {
+        const res = await fetch(`http://localhost:3000/api/users/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        });
+
+        if (res.ok) {
+          const users = await res.json();
+          renderUsers(users);
+        } else if (res.status === 401) {
+          showAlert("Sesión expirada. Redirigiendo al login...", "warning");
+          localStorage.removeItem("token");
+          localStorage.removeItem("userId");
+          setTimeout(() => window.location.href = "login.html", 2000);
+        } else {
+          const errorText = await res.text();
+          showAlert(`Error al cargar usuarios: ${errorText}`, "danger");
+          renderErrorRow("❌ Error al cargar usuarios");
         }
-        async function loadUsers() { 
-            const token = localStorage.getItem("token"); 
-            const userId = localStorage.getItem("userId"); 
-            if (!token || !userId) {
-                showAlert("No hay sesión activa. Redirigiendo al login...", "warning");
-                setTimeout(() => {
-                    window.location.href = "login.html";
-                }, 2000);
-                return;
-            } 
-            try {
-                const res = await fetch(`http://localhost:3000/api/users/${userId}`, { 
-                    headers: { 
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json"
-                    } 
-                }); 
-                
-                if (res.ok) { 
-                    const users = await res.json(); 
-                    renderUsers(users);
-                } else if (res.status === 401) {
-                    showAlert("Sesión expirada. Redirigiendo al login...", "warning");
-                    localStorage.removeItem("token");
-                    localStorage.removeItem("userId");
-                    setTimeout(() => {
-                        window.location.href = "login.html";
-                    }, 2000);
-                } else { 
-                    const errorText = await res.text();
-                    showAlert(`Error al cargar usuarios: ${errorText}`, "danger");
-                    document.getElementById("users-tbody").innerHTML = `
-                        <tr>
-                            <td colspan="7" class="text-center py-4 text-danger">
-                                ❌ Error al cargar usuarios
-                            </td>
-                        </tr>
-                    `;
-                } 
-            } catch (error) {
-                showAlert(`Error de conexión: ${error.message}`, "danger");
-                document.getElementById("users-tbody").innerHTML = `
-                    <tr>
-                        <td colspan="7" class="text-center py-4 text-danger">
-                            ❌ Error de conexión
-                        </td>
-                    </tr>
-                `;
-            }
-        }
-        
-        function renderUsers(users) {
-            const tbody = document.getElementById("users-tbody");
-            
-            if (!users || users.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="text-center py-4 text-muted">
-                            🔍 No hay otros usuarios registrados
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            tbody.innerHTML = users.map(user => {
-                // Extraer información de la persona asociada
-                const persona = user.persona || {};
-                const nombre = persona.nombre || 'Sin nombre';
-                const apellido = persona.apellido || '';
-                const nombreCompleto = `${nombre} ${apellido}`.trim();
-                const email = persona.email || 'Sin email';
-                const telefono = persona.telefono || 'Sin teléfono';
-                const documento = persona.documento || 'Sin documento';
-                const estado = user.activo ? 
-                    '<span class="badge bg-success">Activo</span>' : 
-                    '<span class="badge bg-danger">Inactivo</span>';
-                
-                return `
-                    <tr>
-                        <td>${user.id}</td>
-                        <td>${nombreCompleto}</td>
-                        <td>${email}</td>
-                        <td>${telefono}</td>
-                        <td>${documento}</td>
-                        <td>${estado}</td>
-                        <td>
-                            <div class="btn-group" role="group">
-                                <button class="btn btn-warning btn-sm" onclick="editUser(${user.id})">
-                                    ✏️
-                                </button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id}, '${nombreCompleto}')">
-                                    🗑️
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-        // Cargar reservas al abrir la página 
-        window.onload = loadUsers; 
-    </script>
-    
+      } catch (error) {
+        showAlert(`Error de conexión: ${error.message}`, "danger");
+        renderErrorRow("❌ Error de conexión");
+      }
+    }
+
+    function renderUsers(users) {
+      const tbody = document.getElementById("users-tbody");
+
+      if (!users || users.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="text-center py-4 text-muted">
+              🔍 No hay otros usuarios registrados
+            </td>
+          </tr>`;
+        return;
+      }
+
+      tbody.innerHTML = users.map(user => {
+        const persona = user.persona || {};
+        const nombreCompleto = `${persona.nombre || 'Sin nombre'} ${persona.apellido || ''}`.trim();
+        const email = persona.email || 'Sin email';
+        const telefono = persona.telefono || 'Sin teléfono';
+        const documento = persona.documento || 'Sin documento';
+        const estado = user.activo
+          ? '<span class="badge bg-success">Activo</span>'
+          : '<span class="badge bg-danger">Inactivo</span>';
+
+        return `
+          <tr>
+            <td>${user.id}</td>
+            <td>${nombreCompleto}</td>
+            <td>${email}</td>
+            <td>${telefono}</td>
+            <td>${documento}</td>
+            <td>${estado}</td>
+            <td>
+              <div class="btn-group" role="group">
+                <button class="btn btn-warning btn-sm" onclick="editUser(${user.id})">✏️</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id}, '${nombreCompleto}')">🗑️</button>
+              </div>
+            </td>
+          </tr>`;
+      }).join('');
+    }
+
+    function renderErrorRow(message) {
+      document.getElementById("users-tbody").innerHTML = `
+        <tr>
+          <td colspan="7" class="text-center py-4 text-danger">${message}</td>
+        </tr>`;
+    }
+
+    // Función para mostrar alertas en Bootstrap
+    function showAlert(message, type = "info") {
+      const alertContainer = document.getElementById("alert-container");
+      alertContainer.innerHTML = `
+        <div class="alert alert-${type} alert-dismissible fade show mt-3" role="alert">
+          ${message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>`;
+    }
+
+    // Cargar usuarios al abrir la página
+    window.onload = loadUsers;
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

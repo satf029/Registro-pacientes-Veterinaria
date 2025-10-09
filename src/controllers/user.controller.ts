@@ -52,9 +52,8 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
             });
         }
         const users = getUsers
-        if (!users){
+
             roleId = 1;
-        }
         // Hash de la contraseña
         const hashPassword = await bcrypt.hash(password, 10);
         
@@ -100,4 +99,41 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
     } catch (error) {
         next(error);
     }
+};
+export const updateUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const { nombre, apellido, telefono, email, direccion, activo } = req.body;
+
+    // Validar que id sea numérico
+    if (!id) {
+      return res.status(400).json({ message: "ID de usuario requerido" });
+    }
+
+    // Actualizar datos
+    const updatedUser = await prisma.user.update({
+      where: { id: Number(id) },
+      data: {
+        persona: {
+          update: {
+            nombre,
+            apellido,
+            telefono,
+            email,
+            direccion
+          }
+        },
+        activo
+      },
+      include: {
+        persona: true,
+        roles: true,
+        servicios: true
+      }
+    });
+
+    res.json(updatedUser);
+  } catch (error) {
+    next(error);
+  }
 };

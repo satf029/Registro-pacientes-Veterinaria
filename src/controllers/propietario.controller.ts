@@ -47,3 +47,12 @@ export const crearPropietario = async (req: Request, res: Response, next: NextFu
 
   res.json(propietario)
 }
+
+export const listPropietarios = async(req: Request, res: Response, next: NextFunction)=>{
+    try {
+        const listaPropietarios = await prisma.propietario.findMany();
+        res.json(listaPropietarios);
+    } catch (error) {
+        next(error);
+    }
+}

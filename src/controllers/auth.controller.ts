@@ -48,3 +48,51 @@ export const login = async(req: Request, res:Response, next: NextFunction)=>{
 
 
 }
+export const restablecerContraseña = async (req: Request, res:Response, next: NextFunction)=>{
+    const {documento, correo} = req.body;
+
+    try {
+        const usuarioBuscado = await  prisma.user.findUnique({
+            where:{
+                username: documento,
+            },
+            include:{
+                persona:true
+            }
+        });
+        if (!usuarioBuscado){
+            return res.status(404).json({
+                message: "No existe un usuario asociado al username y correo electronico proporcionado"
+            });
+        }
+        const {persona} = usuarioBuscado;
+        if (!persona || !persona.email == correo){
+            return res.status(404).json({
+                message: "No existe un usuario asociado al username y correo electronico proporcionado"
+            })
+        }
+
+    } catch (error) {
+        
+    }
+}
+export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+    const {userId } = req.params;
+    const {  newPassword } = req.body;
+
+    try {
+
+        const hashed = await bcrypt.hash(newPassword, 10);
+
+        await prisma.$transaction([
+            prisma.user.update({
+                where: { id: Number(userId) },
+                data: { password: hashed },
+            })
+        ]);
+
+        return res.json({ message: "Contraseña actualizada correctamente" });
+    } catch (err) {
+        next(err);
+    }
+};

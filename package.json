@@ -21,11 +21,14 @@
   "homepage": "https://github.com/satf029/Registro-pacientes-Veterinaria#readme",
   "dependencies": {
     "@prisma/client": "^6.15.0",
+    "@tailwindcss/postcss": "^4.1.13",
     "axios": "^1.12.2",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.13"
   },
   "devDependencies": {
     "@types/axios": "^0.9.36",

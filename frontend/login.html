@@ -1,50 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
-    <title>Login</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-    <h1>Prueba de Login</h1>
-    <!-- Agregar div para mostrar mensajes -->
-    <div id="output" class="alert alert-danger" style="display: none;"></div>
-    <div class="input-group flex-nowrap">
-        <span class="input-group-text" id="addon-wrapping">username</span>
-        <input type="text" class="form-control" id="username" placeholder="Username" aria-label="Username" aria-describedby="addon-wrapping">
-    </div>
-    <div class="input-group flex-nowrap">
-        <span class="input-group-text" id="addon-wrapping">Password</span>
-        <input type="text" class="form-control" id="password" placeholder="Password" aria-label="Username" aria-describedby="addon-wrapping">
-    </div>
-    <button type="button" class="btn btn-success" onclick="login()">Iniciar Sesion</button>
-     <script>
- let token = "";
- async function login() {
- // agregar email y password
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
-    const res = await fetch("http://localhost:3000/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
-        });
-    if (res.ok) {
-        const data = await res.json();
-        token = data.token;
-        const userId = data.userId;
-        // Guardar token en localStorage
-        localStorage.setItem("token", token);
-        localStorage.setItem("userId", userId);
-        // Redirigir a reservas
-        window.location.href = "usuarios.html";
-    } else {
-        const errorText = await res.text();
-        document.getElementById("output").textContent = "Error: " + errorText;
-    }
- }
+    <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-indigo-500 to-blue-600">
+        <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
+            <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Login</h1>
+        
+            <div id="output" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"></div>
 
- </script>
+            <!-- Username -->
+            <div class="mb-4">
+            <label for="username" class="block text-gray-700 font-semibold mb-2">Username</label>
+            <input 
+                type="text" 
+                id="username" 
+                placeholder="Ingrese su usuario" 
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+            >
+            </div>
+
+            <!-- Password -->
+            <div class="mb-6">
+            <label for="password" class="block text-gray-700 font-semibold mb-2">Password</label>
+            <input 
+                type="password" 
+                id="password" 
+                placeholder="Ingrese su contraseña" 
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+            >
+            </div>
+
+            <!-- Botón -->
+            <button 
+            type="button" 
+            onclick="login()"
+            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 ease-in-out"
+            >
+            Iniciar Sesión
+            </button>
+        </div>
+        </div>
+
+     <script>
+    let token = "";
+    async function login() {
+    // agregar email y password
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+        const res = await fetch("http://localhost:3000/api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password })
+            });
+        if (res.ok) {
+            const data = await res.json();
+            token = data.token;
+            const userId = data.userId;
+            // Guardar token en localStorage
+            localStorage.setItem("token", token);
+            localStorage.setItem("userId", userId);
+            // Redirigir a reservas
+            window.location.href = "usuarios.html";
+        } else {
+            const errorText = await res.text();
+            document.getElementById("output").textContent = "Error: " + errorText;
+        }
+    }
+
+    </script>
 </body>
 </html>

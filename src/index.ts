@@ -31,14 +31,14 @@ app.use(express.static(path.join(__dirname, "../frontend")));
 
 const PORT = process.env.PORT || 3000;
 
-/* export default app; */
+export default app; 
 
-
+/*
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
 
-/* app.listen(3000, ()=>{
+app.listen(3000, ()=>{
     console.log('Servidor');
 }
 ) */

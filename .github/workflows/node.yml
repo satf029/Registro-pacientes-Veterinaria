@@ -40,6 +40,8 @@ jobs:
         run: npm ci
       - name: Generar cliente Prisma
         run: npx prisma generate
+      - name: Aplicar migraciones
+        run: npx prisma migrate deploy
       - name: Compilar TypeScript
         run: npx tsc --noEmit
       - name: Ejecutar tests

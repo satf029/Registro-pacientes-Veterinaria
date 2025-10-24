@@ -1,7 +1,12 @@
 import request from "supertest";
 import app from "../src/index"; 
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 
 describe("Rutas de Usuario", () => {
+  beforeAll(async () => {
+    await prisma.rol.create({ data: { nombre: "Administrador" } });
+  });
   it("Crear usuario, retornar el usuario nuevo", async () => {
     const res = await request(app).post("/api/users").send({
       nombre: "Prueba",

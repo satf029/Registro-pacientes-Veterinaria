@@ -12,6 +12,7 @@ import serviceRoute from "./routes/servicio.route";
 import pacienteRoute from "./routes/paciente.routes"
 
 const app = express();
+app.disable("x-powered-by");
 
 app.use(cors());
 app.use(express.json());
@@ -30,11 +31,14 @@ app.use(express.static(path.join(__dirname, "../frontend")));
 
 const PORT = process.env.PORT || 3000;
 
+/* export default app; */
+
+
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
-/*
-app.listen(3000, ()=>{
+
+/* app.listen(3000, ()=>{
     console.log('Servidor');
 }
-)*/
+) */

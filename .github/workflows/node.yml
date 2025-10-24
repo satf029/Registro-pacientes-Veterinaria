@@ -1,0 +1,32 @@
+name: Node CI - Registro Veterinaria
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Instalar dependencias
+        run: npm ci
+      - name: Generar cliente Prisma
+        run: npx prisma generate
+      - name: Compilar TypeScript
+        run: npx tsc --noEmit
+      - name: Ejecutar tests
+        run: npm test
+
+
+
+
+
